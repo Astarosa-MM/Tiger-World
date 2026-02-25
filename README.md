@@ -1,10 +1,10 @@
-# [Name of the Project] : [Team Number]
+# Tiger World : Team 5
 # Members
-Project Manager: [Name] ([GitHub Name])\
-Communications Lead: [Name] ([GitHub Name])\
-Git Master: [Name] ([GitHub Name])\
-Design Lead: [Name] ([GitHub Name])\
-Quality Assurance Tester: [Name] ([GitHub Name])
+SCRUM Master: Mia Miranda ([GitHub Name])\
+UI/UX Designer: Katherine Winchester ([GitHub Name])\
+Software Architect: Stella Levy ([GitHub Name])\
+Senior Developer: Brent Bolden ([GitHub Name])\
+Product Tester: Khoa Vu ([GitHub Name])
 
 # About Our Software
 
@@ -16,7 +16,7 @@ Describe a little about what the project is about here.
 - Linux
 - Windows
 # Important Links
-Kanban Board: [link]\
+Kanban Board: https://lsu-csc4330-tiger-world.atlassian.net/jira/software/projects/SCRUM/boards/1\
 Designs: [link]\
 Styles Guide(s): [link]
 

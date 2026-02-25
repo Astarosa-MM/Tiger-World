@@ -16,7 +16,7 @@ Describe a little about what the project is about here.
 - Linux
 - Windows
 # Important Links
-Kanban Board: https://lsu-csc4330-tiger-world.atlassian.net/jira/software/projects/SCRUM/boards/1\
+Kanban Board: https://lsu-csc4330-tiger-world.atlassian.net/jira/software/projects/SCRUM/boards/1 \
 Designs: [link]\
 Styles Guide(s): [link]
 

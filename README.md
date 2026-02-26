@@ -8,13 +8,9 @@ Product Tester: Khoa Vu ([GitHub Name])
 
 # About Our Software
 
-Describe a little about what the project is about here.
+Tiger World is a mobile app that provides campus navigation. It displays the the locations of buildings on campus while also providing details inside of the building such as classrooms, bathrooms, elevators, stairs, and so on. The app will also update the user's position in real time as they travel. An important feature of this app is the ability for verified users to make updates to the app to reflect real world changes, such as room or building closures, so that the map can be as accurate as possible.
 ## Platforms Tested on
-- MacOS
 - Android
-- iOS
-- Linux
-- Windows
 # Important Links
 Kanban Board: https://lsu-csc4330-tiger-world.atlassian.net/jira/software/projects/SCRUM/boards/1 \
 Designs: [link]\

@@ -21,34 +21,37 @@ check (building_status in (‘AVAILABLE’, ’UNAVAILABLE’))
 create table floor (
 building_ID			bigint unsigned not null,
 floor_ID			bigint unsigned auto_increment,
-floor_number			bigint unsigned unique,
+floor_number			bigint unsigned,
 floor_status			 varchar(11) not null,
 
 primary key (floor_ID),
 foreign key (building_ID) references building(building_ID),
+unique(building_ID, floor_number),
 check (floor_status in (‘AVAILABLE’, ’UNAVAILABLE’))
 );
 
 create table zone (
 floor_ID			bigint unsigned not null,
 zone_ID			bigint unsigned auto_increment,
-zone_number		bigint unsigned unique,
+zone_number		bigint unsigned,
 zone_status			varchar(11) not null,
 
 primary key (zone_ID),
 foreign key (floor_ID) references floor(floor_ID),
+unique(floor_ID, zone_number),
 check (zone_status in (‘AVAILABLE’, ’UNAVAILABLE’))
 );
 
 create table room (
 floor_ID			bigint unsigned not null,
 room_ID			bigint unsigned auto_increment,
-room_number			bigint unsigned unique,
+room_number			bigint unsigned,
 room_classification		varchar(9),
 room_status			varchar(11) not null,
 
 primary key (room_ID),
 foreign key (floor_ID) references floor(floor_ID),
+unique(floor_ID, room_number),
 check (room_classification in (‘CLASSROOM’, ’FOOD’, ‘RESTROOM’, ‘ELEVATOR’, ‘STAIRS’, ‘LAB’)),
 check (room_status in (‘AVAILABLE’, ’UNAVAILABLE’))
 );

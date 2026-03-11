@@ -11,4 +11,11 @@ check (connection_type in (‘VERTICAL’, ’LATERAL’)),
 check (room_A_ID <> room_B_ID)
 );
 
-(room_to_zone)
+create table room_to_zone (
+room_ID		bigint unsigned,
+zone_ID		bigint unsigned,
+
+primary key (room_ID, zone_ID),
+foreign key (room_ID) references room(room_ID),
+foreign key (zone_ID) references zone(zone_ID)
+);

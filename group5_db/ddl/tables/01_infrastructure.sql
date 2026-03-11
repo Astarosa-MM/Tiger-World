@@ -4,7 +4,7 @@ campus_name		varchar(255),
 campus_status		varchar(11) not null,
 
 primary key (campus_ID),
-check (campus_status in (‘AVAILABLE’, ’UNAVAILABLE’))
+check (campus_status in ('AVAILABLE', 'UNAVAILABLE'))
 );
 
 create table building (
@@ -15,7 +15,7 @@ building_status		varchar(11) not null,
 
 primary key (building_ID),
 foreign key (campus_ID) references campus(campus_ID),
-check (building_status in (‘AVAILABLE’, ’UNAVAILABLE’))
+check (building_status in ('AVAILABLE', 'UNAVAILABLE'))
 );
 
 create table floor (
@@ -27,7 +27,7 @@ floor_status			 varchar(11) not null,
 primary key (floor_ID),
 foreign key (building_ID) references building(building_ID),
 unique(building_ID, floor_number),
-check (floor_status in (‘AVAILABLE’, ’UNAVAILABLE’))
+check (floor_status in ('AVAILABLE', 'UNAVAILABLE'))
 );
 
 create table zone (
@@ -39,7 +39,7 @@ zone_status			varchar(11) not null,
 primary key (zone_ID),
 foreign key (floor_ID) references floor(floor_ID),
 unique(floor_ID, zone_number),
-check (zone_status in (‘AVAILABLE’, ’UNAVAILABLE’))
+check (zone_status in ('AVAILABLE', 'UNAVAILABLE'))
 );
 
 create table room (
@@ -52,6 +52,6 @@ room_status			varchar(11) not null,
 primary key (room_ID),
 foreign key (floor_ID) references floor(floor_ID),
 unique(floor_ID, room_number),
-check (room_classification in (‘CLASSROOM’, ’FOOD’, ‘RESTROOM’, ‘ELEVATOR’, ‘STAIRS’, ‘LAB’)),
-check (room_status in (‘AVAILABLE’, ’UNAVAILABLE’))
+check (room_classification in ('CLASSROOM', 'FOOD', 'RESTROOM', 'ELEVATOR', 'STAIRS', 'LAB')),
+check (room_status in ('AVAILABLE', 'UNAVAILABLE'))
 );

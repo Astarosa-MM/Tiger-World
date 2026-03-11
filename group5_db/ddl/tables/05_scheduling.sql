@@ -9,5 +9,5 @@ end_time		time,
 event_date		date,
 
 primary key (event_ID),
-check(owner_type in (‘USER’, ‘CAMPUS’, ‘BUILDING’, ‘FLOOR’, ‘ZONE’, ‘ROOM’))
+check(owner_type in ('USER', 'CAMPUS', 'BUILDING', 'FLOOR', 'ZONE', 'ROOM'))
 );

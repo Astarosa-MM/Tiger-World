@@ -18,7 +18,16 @@ foreign key (campus_ID) references campus(campus_ID),
 check (campus_status in (‘AVAILABLE’, ’UNAVAILABLE’))
 );
 
-(floor)
+create table floor (
+building_ID			bigint unsigned not null,
+floor_ID			bigint unsigned auto_increment,
+floor_number			varchar(255)
+floor_status			 varchar(11)
+
+primary key (floor_ID),
+foreign key (building_ID) references building(building_ID),
+check (campus_status in (‘AVAILABLE’, ’UNAVAILABLE’))
+);
 
 (zone)
 

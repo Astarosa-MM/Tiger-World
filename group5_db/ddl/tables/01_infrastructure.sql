@@ -40,4 +40,15 @@ foreign key (floor_ID) references floor(floor_ID),
 check (campus_status in (‘AVAILABLE’, ’UNAVAILABLE’))
 );
 
-(room)
+create table room (
+floor_ID			bigint unsigned not null,
+room_ID			bigint unsigned auto_increment,
+room_number			bigint unsigned unique
+room_classification		varchar(9)
+zone_status			varchar(11)
+
+primary key (room_ID),
+foreign key (floor_ID) references floor(floor_ID),
+check (room_classification in (‘CLASSROOM’, ’FOOD’, ‘RESTROOM’, ‘ELEVATOR’, ‘STAIRS’, ‘LAB’)),
+check (campus_status in (‘AVAILABLE’, ’UNAVAILABLE’))
+);

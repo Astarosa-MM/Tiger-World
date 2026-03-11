@@ -31,12 +31,10 @@ check(push_notifs in (
 create table user_bookmarks (
 bookmarked_ID		bigint unsigned,
 bookmarked_type		varchar(8),
-
 user_ID			bigint unsigned,
 
 primary key (user_ID, bookmarked_type, bookmarked_ID),
 foreign key (user_ID) references user_info(user_ID),
-
 check(bookmarked_type in (
 ‘CAMPUS’, ‘BUILDING’, ‘FLOOR’, ‘ZONE’, ‘ROOM’))
 );

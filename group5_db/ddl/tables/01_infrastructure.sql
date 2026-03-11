@@ -21,7 +21,7 @@ check (building_status in (‘AVAILABLE’, ’UNAVAILABLE’))
 create table floor (
 building_ID			bigint unsigned not null,
 floor_ID			bigint unsigned auto_increment,
-floor_number			varchar(255),
+floor_number			bigint unsigned unique,
 floor_status			 varchar(11),
 
 primary key (floor_ID),

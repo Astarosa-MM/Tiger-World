@@ -1,4 +1,5 @@
 -- gives the database a target to jump to when (infrastructure_entity_type)_status is used in a query
+
 create index idx_campus_status on campus(campus_status);
 
 create index idx_building_status on building(building_status);

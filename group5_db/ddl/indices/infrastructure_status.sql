@@ -14,4 +14,4 @@ create index idx_floor_status on floor(floor_status);
 
 create index idx_zone_status on zone(zone_status);
 
-(room status)
+create index idx_room_status on room(room_status);

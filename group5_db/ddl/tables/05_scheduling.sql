@@ -8,18 +8,25 @@
  */
 
 create table events (
-user_ID		bigint unsigned,
-infrastructure_ID		bigint unsigned not null,
-infrastructure_type		char(4) not null,
+    event_ID            bigint unsigned auto_increment,
+    infrastructure_ID   bigint unsigned not null,
+    infrastructure_type infrastructure_type		char(4) not null,
 
-event_ID		bigint unsigned auto_increment,
-event_name		varchar(255), 
-start_time		time,
-end_time		time,
-event_date		date,
+    event_name          varchar(255) not null, 
+    start_time          time,
+    end_time            time,
+    event_date          date,
 
-primary key (event_ID),
-foreign key (user_ID) references user_info(user_ID),
-check(infrastructure_type in ('CAMPUS', 'BUILDING', 'FLOOR', 'ZONE', 'ROOM')),
-unique(infrastructure_type, infrastructure_ID, event_date, start_time, end_time, event_name)
+    primary key (event_ID),
+    check (infrastructure_type in ('CAMPUS', 'BUILDING', 'FLOOR', 'ZONE', 'ROOM')),
+    unique (infrastructure_type, infrastructure_ID, event_date, start_time, end_time, event_name)
+);
+
+create table user_events (
+    user_ID   bigint unsigned not null,
+    event_ID  bigint unsigned not null,
+
+    primary key (user_ID, event_ID),
+    foreign key (user_ID) references user_info(user_ID),
+    foreign key (event_ID) references events(event_ID)
 );

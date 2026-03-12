@@ -2,14 +2,11 @@
  * 'status' column of various
  * infrastructure tables
  
- * use-case example:
- * filtering available rooms
- * on a given floor,
- * match building ID of current building
- * to 'building ID' in room,
- * impose where status = 'AVAILABLE' condition*/
+ * use-case example: filtering for available rooms on a given floor
+ * 1) filter rooms to those in the desired building by matching building_ID
+ * 2) using index, impose where status = 'AVAILABLE' condition */
 
-(campus status)
+create index idx_campus_status on campus(campus_status);
 
 (building status)
 

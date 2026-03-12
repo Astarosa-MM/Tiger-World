@@ -1,10 +1,4 @@
-/* retrieves value stored in
- * 'status' column of various
- * infrastructure tables
- 
- * use-case example: filtering for available rooms on a given floor
- * 1) filter rooms to those in the desired building by matching building_ID
- * 2) using index, impose where status = 'AVAILABLE' condition */
+gives the database a target to jump to when (infrastructure entity type)_status is used in a query
 
 create index idx_campus_status on campus(campus_status);
 

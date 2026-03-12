@@ -1,6 +1,9 @@
+/* when infrastructure owns an event, userID -> null */
+
 create table events (
-owner_ID		bigint unsigned,
-owner_type		char(4),
+user_ID		bigint unsigned,
+infrastructure_ID		bigint unsigned not null,
+infrastructure_type		char(4) not null,
 
 event_ID		bigint unsigned auto_increment,
 event_name		varchar(255), 
@@ -9,5 +12,6 @@ end_time		time,
 event_date		date,
 
 primary key (event_ID),
-check(owner_type in ('USER', 'CAMPUS', 'BUILDING', 'FLOOR', 'ZONE', 'ROOM'))
+foreign key (user_ID) references user_info(user_ID),
+check(infrastructure_type in ('CAMPUS', 'BUILDING', 'FLOOR', 'ZONE', 'ROOM'))
 );

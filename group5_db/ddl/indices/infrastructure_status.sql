@@ -10,7 +10,7 @@ create index idx_campus_status on campus(campus_status);
 
 create index idx_building_status on building(building_status);
 
-(floor status)
+create index idx_floor_status on floor(floor_status);
 
 (zone status)
 

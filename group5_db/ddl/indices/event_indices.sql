@@ -1,4 +1,4 @@
--- gives the database a target to jump to when infra_type, infra_ID, or event_date are used in a query
+-- gives the database a COMPOSITE target to jump to when infra_type, infra_ID, or event_date are used in a query
 create index idx_event_date_infra on infra_events(infra_type, infra_ID, event_date);
 
 -- gives the database a target to jump to when user_ID is used in a query

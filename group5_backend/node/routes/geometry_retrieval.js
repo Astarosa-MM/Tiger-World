@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const db = req.app.locals.db;
 
 /**
  * GET /infrastructure/geometry
@@ -17,6 +16,9 @@ const db = req.app.locals.db;
  *    2. Type + ID → specific entity (optionally include children)
  */
 router.get('/', (req, res) => {
+    
+    const db = req.app.locals.db;
+    
     const { vertex_owner_type, vertex_owner_ID, include_children } = req.query;
 
     // integrity checks

@@ -23,15 +23,17 @@ app.get('/', (req, res) => {
 });
 
 // import routers
-const geometryRoutes = require('./routes/placeholder');
-const userEventsRoutes = require('./routes/user_schedule');
-const infraScheduleRoutes = require('./routes/infra_schedule');
-const eventScheduleRoutes = require('./routes/event_schedule');
+const geometryRoutes = require('./routes/infrastructure/geometry');
+
+const eventAttributeRoutes = require('./routes/schedule_retrieval/event_attribute');
+const eventLocationRoutes = require('./routes/schedule_retrieval/event_location');
+const eventUserIDRoutes = require('./routes/schedule_retrieval/event_userID');
 
 // mount routers
 app.use('/infrastructure/geometry', geometryRoutes);
-app.use('/scheduling/user', userEventsRoutes);
-app.use('/scheduling/infrastructure', infraScheduleRoutes);
-app.use('/scheduling/events', eventScheduleRoutes);
+
+app.use('/scheduling/events/attributes', eventAttributeRoutes);
+app.use('/scheduling/events/location', eventLocationRoutes);
+app.use('/scheduling/events/users', eventUserIDRoutes);
 
 app.listen(port, () => console.log(`server running on port ${port}`));

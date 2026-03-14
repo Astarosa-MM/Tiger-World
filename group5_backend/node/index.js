@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 });
 
 // import routers
-const geometryRoutes = require('./routes/infrastructure/geometry');
+const geometryRoutes = require('./routes/geometry_retrieval');
 
 const eventAttributeRoutes = require('./routes/schedule_retrieval/event_attribute');
 const eventLocationRoutes = require('./routes/schedule_retrieval/event_location');

@@ -20,7 +20,11 @@ app.get('/', (req, res) => {
 });
 
 //geometry routes
-const geometryRoutes = require('./routes/placeholder_filename');
+const geometryRoutes = require('./routes/placeholder');
 app.use('/infrastructure/geometry', geometryRoutes);
+
+// user schedule
+const userEventsRoutes = require('./routes/placeholder2');
+app.use('/scheduling/user', userEventsRoutes);
 
 app.listen(port, () => console.log(`server running on port ${port}`));

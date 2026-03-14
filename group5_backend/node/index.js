@@ -14,17 +14,24 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME
 });
 
-// routes
+// make db accessible to routers via app.locals
+app.locals.db = db;
+
+// basic test route
 app.get('/', (req, res) => {
     res.send('Hello Railway');
 });
 
-//geometry routes
+// import routers
 const geometryRoutes = require('./routes/placeholder');
-app.use('/infrastructure/geometry', geometryRoutes);
+const userEventsRoutes = require('./routes/user_schedule');
+const infraScheduleRoutes = require('./routes/infra_schedule');
+const eventScheduleRoutes = require('./routes/event_schedule');
 
-// user schedule
-const userEventsRoutes = require('./routes/placeholder2');
+// mount routers
+app.use('/infrastructure/geometry', geometryRoutes);
 app.use('/scheduling/user', userEventsRoutes);
+app.use('/scheduling/infrastructure', infraScheduleRoutes);
+app.use('/scheduling/events', eventScheduleRoutes);
 
 app.listen(port, () => console.log(`server running on port ${port}`));

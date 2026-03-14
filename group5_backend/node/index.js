@@ -14,8 +14,13 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME
 });
 
+// routes
 app.get('/', (req, res) => {
     res.send('Hello Railway');
 });
+
+//geometry routes
+const geometryRoutes = require('./routes/placeholder_filename');
+app.use('/infrastructure/geometry', geometryRoutes);
 
 app.listen(port, () => console.log(`server running on port ${port}`));

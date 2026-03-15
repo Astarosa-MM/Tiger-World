@@ -1,7 +1,6 @@
 // event_schedule.js
 const express = require('express');
 const router = express.Router();
-const db = req.app.locals.db;
 
 /* search for events by any combination of the following event attributes:
  *      - event name
@@ -18,6 +17,8 @@ const db = req.app.locals.db;
  */
 
 router.get('/', (req, res) => {
+
+    const db = req.app.locals.db;
 
     const {
         event_name,

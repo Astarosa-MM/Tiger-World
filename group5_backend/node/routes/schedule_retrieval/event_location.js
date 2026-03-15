@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const db = req.app.locals.db;
 
 /* search for events by any combination of infrastructure entity:
  *      - infra_type (required if infra_ID provided)
@@ -24,6 +23,9 @@ const db = req.app.locals.db;
  */
 
 router.get('/', (req, res) => {
+
+    const db = req.app.locals.db;
+    
     const {
         infra_type,
         infra_ID,

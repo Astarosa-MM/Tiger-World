@@ -25,9 +25,6 @@ router.get('/', (req, res) => {
     if (!vertex_owner_type) {
         return res.status(400).json({ error: 'vertex_owner_type is required' });
     }
-    if (vertex_owner_ID && !vertex_owner_type) {
-        return res.status(400).json({ error: 'vertex_owner_ID requires vertex_owner_type' });
-    }
 
     // Build list of owner conditions
     let ownerQuery = '';

@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const db = req.app.locals.db;
 
 /* search for events by any combination of userID (required)
  * and event attributes (name, location, date, start and or end time etc.) (optional)
@@ -14,6 +13,8 @@ const db = req.app.locals.db;
  */
 
 router.get('/', (req, res) => {
+
+    const db = req.app.locals.db;
 
     const {
         user_ID,

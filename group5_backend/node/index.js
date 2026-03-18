@@ -23,15 +23,11 @@ app.get('/', (req, res) => {
 });
 
 // import routers
-const geometryRoutes = require('./routes/geometry_retrieval');
-
 const eventAttributeRoutes = require('./routes/schedule_retrieval/event_attribute');
 const eventLocationRoutes = require('./routes/schedule_retrieval/event_location');
 const eventUserIDRoutes = require('./routes/schedule_retrieval/event_userID');
 
 // mount routers
-app.use('/infrastructure/geometry', geometryRoutes);
-
 app.use('/scheduling/events/attributes', eventAttributeRoutes);
 app.use('/scheduling/events/location', eventLocationRoutes);
 app.use('/scheduling/events/users', eventUserIDRoutes);

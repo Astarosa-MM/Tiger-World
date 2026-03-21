@@ -27,9 +27,14 @@ const eventAttributeRoutes = require('./routes/schedule_retrieval/event_attribut
 const eventLocationRoutes = require('./routes/schedule_retrieval/event_location');
 const eventUserIDRoutes = require('./routes/schedule_retrieval/event_userID');
 
+const insertElevatorStopRoute = require("./routes/insert_elevatorstop");
+
 // mount routers
 app.use('/scheduling/events/attributes', eventAttributeRoutes);
 app.use('/scheduling/events/location', eventLocationRoutes);
 app.use('/scheduling/events/users', eventUserIDRoutes);
 
+app.use("/api", insertElevatorStopRoute);
+
+//
 app.listen(port, () => console.log(`server running on port ${port}`));

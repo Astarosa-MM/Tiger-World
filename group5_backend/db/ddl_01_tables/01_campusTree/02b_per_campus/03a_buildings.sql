@@ -1,10 +1,13 @@
-create table building (
-campus_ID			bigint unsigned not null,
-building_ID			bigint unsigned auto_increment,
-building_name		varchar(255),
-building_status		varchar(11) not null,
+CREATE TABLE building (
+    campus_ID       BIGINT UNSIGNED NOT NULL,
+    building_ID     BIGINT UNSIGNED AUTO_INCREMENT,
+    building_name   VARCHAR(255),
+    building_status VARCHAR(11) NOT NULL,
 
-primary key (building_ID),
-foreign key (campus_ID) references campus(campus_ID),
-check (building_status in ('AVAILABLE', 'UNAVAILABLE'))
+    PRIMARY KEY (building_ID),
+    FOREIGN KEY (campus_ID)
+        REFERENCES campus(campus_ID)
+        ON DELETE CASCADE,
+
+    CHECK (building_status IN ('AVAILABLE', 'UNAVAILABLE'))
 );

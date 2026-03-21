@@ -1,13 +1,18 @@
-create table room (
-floor_ID			bigint unsigned not null,
-room_ID			bigint unsigned auto_increment,
-room_number			bigint unsigned,
-room_classification		varchar(9),
-room_status			varchar(11) not null,
+CREATE TABLE room (
+    floor_ID             BIGINT UNSIGNED NOT NULL,
+    room_ID              BIGINT UNSIGNED AUTO_INCREMENT,
+    room_number          BIGINT UNSIGNED,
+    room_classification  VARCHAR(9),
+    room_status          VARCHAR(11) NOT NULL,
 
-primary key (room_ID),
-foreign key (floor_ID) references floor(floor_ID),
-unique(floor_ID, room_number),
-check (room_classification in ('CLASSROOM', 'FOOD', 'RESTROOM', 'LAB')),
-check (room_status in ('AVAILABLE', 'UNAVAILABLE'))
+    PRIMARY KEY (room_ID),
+
+    FOREIGN KEY (floor_ID)
+        REFERENCES floor(floor_ID)
+        ON DELETE CASCADE,
+
+    UNIQUE (floor_ID, room_number),
+
+    CHECK (room_classification IN ('CLASSROOM', 'FOOD', 'RESTROOM', 'LAB')),
+    CHECK (room_status IN ('AVAILABLE', 'UNAVAILABLE'))
 );

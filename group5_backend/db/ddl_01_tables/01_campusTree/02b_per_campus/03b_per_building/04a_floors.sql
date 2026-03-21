@@ -1,11 +1,17 @@
-create table floor (
-building_ID			bigint unsigned not null,
-floor_ID			bigint unsigned auto_increment,
-floor_number			bigint unsigned,
-floor_status			 varchar(11) not null,
+CREATE TABLE floor (
+    building_ID   BIGINT UNSIGNED NOT NULL,
+    floor_ID      BIGINT UNSIGNED AUTO_INCREMENT,
+    floor_number  BIGINT UNSIGNED NOT NULL,
+    name          VARCHAR(255) NOT NULL,
+    floor_status  VARCHAR(11) NOT NULL,
 
-primary key (floor_ID),
-foreign key (building_ID) references building(building_ID),
-unique(building_ID, floor_number),
-check (floor_status in ('AVAILABLE', 'UNAVAILABLE'))
+    PRIMARY KEY (floor_ID),
+
+    FOREIGN KEY (building_ID)
+        REFERENCES building(building_ID)
+        ON DELETE CASCADE,
+
+    UNIQUE (building_ID, floor_number),
+
+    CHECK (floor_status IN ('AVAILABLE', 'UNAVAILABLE'))
 );

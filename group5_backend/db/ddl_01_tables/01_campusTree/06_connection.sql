@@ -1,24 +1,9 @@
 CREATE TABLE connection (
-    connection_ID    BIGINT UNSIGNED AUTO_INCREMENT,
-
-    ownerA_type      VARCHAR(10) NOT NULL, -- 'ROOM','HALLWAY','STOP'
-    ownerA_ID        BIGINT UNSIGNED NOT NULL,
-
-    ownerB_type      VARCHAR(10) NOT NULL,
-    ownerB_ID        BIGINT UNSIGNED NOT NULL,
-
-    connection_type  VARCHAR(15) NOT NULL, -- 'DOOR','AUTO_DOOR','HALLWAY','VERTICAL'
-    status           VARCHAR(11) NOT NULL, -- 'AVAILABLE','UNAVAILABLE'
-
-    PRIMARY KEY (connection_ID),
-
-    UNIQUE (ownerA_type, ownerA_ID, ownerB_type, ownerB_ID, connection_type),
-
-    CHECK (ownerA_type IN ('ROOM','HALLWAY','STOP')),
-    CHECK (ownerB_type IN ('ROOM','HALLWAY','STOP')),
-
-    CHECK (connection_type IN ('DOOR','AUTO_DOOR','HALLWAY','VERTICAL')),
-    CHECK (status IN ('AVAILABLE','UNAVAILABLE')),
+    ownerA_type ENUM('ROOM','HALLWAY','STOP','CAMPUS') NOT NULL,
+    ownerA_id BIGINT UNSIGNED NOT NULL,
+    ownerB_type ENUM('ROOM','HALLWAY','STOP','CAMPUS') NOT NULL,
+    ownerB_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (ownerA_type, ownerA_id, ownerB_type, ownerB_id),
 
     -- enforce undirected canonical ordering
     /* This works because MySQL compares strings lexicographically.

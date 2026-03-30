@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 
-const NODE_TYPES = ["ROOM", "HALLWAY", "STOP", "FLOOR", "BUILDING", "CAMPUS", "ZONE"];
+const NODE_TYPES = ["ROOM", "HALLWAY", "STOP", "FLOOR", "BUILDING", "ZONE"];
 
 router.delete("/", async (req, res) => {
   const db = req.app.locals.db;
@@ -127,14 +127,11 @@ router.delete("/", async (req, res) => {
       }
     } else if (type === "BUILDING") {
       await connection.execute(`DELETE FROM building WHERE building_ID = ?`, [id]);
-    } else if (type === "CAMPUS") {
-      await connection.execute(`DELETE FROM campus WHERE campus_ID = ?`, [id]);
     }
-
     // -------------------------------------------------
     // 3) Delete any connections involving the node
     // -------------------------------------------------
-    if (["ROOM", "HALLWAY", "STOP", "CAMPUS"].includes(type)) {
+    if (["ROOM", "HALLWAY", "STOP"].includes(type)) {
       const nodeColumn = `${type === "STOP" ? "STOP" : type}`;
       await connection.execute(
         `

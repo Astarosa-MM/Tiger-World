@@ -1,16 +1,14 @@
 const express = require('express');
-const mysql = require('mysql2/promise'); // << use promise version
+const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// middleware to parse JSON
+// parse JSON
 app.use(express.json());
 
-// ---------------------------
-// Database Setup
-// ---------------------------
+// DB setup
 const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -21,57 +19,43 @@ const db = mysql.createPool({
   queueLimit: 0
 });
 
-// make db accessible to routers via app.locals
+// make DB accessible in routers
 app.locals.db = db;
 
-// ---------------------------
-// Basic Test Route
-// ---------------------------
-app.get('/', (req, res) => {
-  res.send('Hello Railway');
-});
+// Basic test
+app.get('/', (req, res) => res.send('Hello Railway'));
 
-// ---------------------------
-// Scheduling / Event Routes
-// ---------------------------
-app.use('/scheduling/events/attributes', require('./routes/schedule_retrieval/event_attribute'));
-app.use('/scheduling/events/location', require('./routes/schedule_retrieval/event_location'));
-app.use('/scheduling/events/users', require('./routes/schedule_retrieval/event_userID'));
+// -----------------------------
+// INSERT ROUTES
+// -----------------------------
+app.use('/api/insert/campus', require('./routes/insert_campusDiagram/01_insert_campus')); // POST /
+app.use('/api/insert/building', require('./routes/insert_campusDiagram/02_insert_building')); // POST /
+app.use('/api/insert/floor', require('./routes/insert_campusDiagram/04_insert_floor')); // POST /
+app.use('/api/insert/room', require('./routes/insert_campusDiagram/05_insert_room')); // POST /
+app.use('/api/insert/hallway', require('./routes/insert_campusDiagram/06_insert_hallway')); // POST /
 
-// ---------------------------
-// Insert Campus Diagram Routes
-// ---------------------------
-// all routes mounted under /api/insert
-const insertRoutes = [
-  '01_insert_campus',
-  '02_insert_building',
-  '03_insert_elevator',
-  '04_insert_floor',
-  '05_insert_room',
-  '06_insert_hallway',
-  '07_insert_elevatorstop',
-  '08_insert_zone',
-  '09_insert_roomzone_association',
-  '10_insert_connection'
-];
+// -----------------------------
+// PRINT ROUTES (normalized)
+// -----------------------------
+app.use('/api/print/campus', require('./routes/print/01_printcampus'));     // GET /?campus_name=optional
+app.use('/api/print/building', require('./routes/print/02_printbuilding')); // GET /?campus_name=
+app.use('/api/print/floor', require('./routes/print/03_printfloors'));      // GET /?campus_name=&building_name=
+app.use('/api/print/room', require('./routes/print/04_printrooms'));        // GET /?campus_name=&building_name=&floor_number=
+app.use('/api/print/hallway', require('./routes/print/05_printhallways'));  // GET /?campus_name=&building_name=&floor_number=
 
-insertRoutes.forEach(file => {
-  app.use('/api/insert', require(`./routes/insert_campusDiagram/${file}`));
-});
+// -----------------------------
+// DROP ROUTES
+// -----------------------------
+app.use('/api/drop/campus', require('./routes/drop/drop_campus'));           // DELETE /
+app.use('/api/drop/building', require('./routes/drop/drop_building'));       // DELETE /
+app.use('/api/drop/connection', require('./routes/drop/drop_connection'));   // DELETE /
+app.use('/api/drop/entity', require('./routes/drop/drop_entity'));           // DELETE /
 
-// ---------------------------
-// Drop Campus Diagram Routes
-// ---------------------------
-app.use('/api/drop', require('./routes/drop_campusDiagram/drop_connection'));
-app.use('/api/drop', require('./routes/drop_campusDiagram/drop_entity'));
+// -----------------------------
+// STATUS ROUTES
+// -----------------------------
+app.use('/api/status', require('./routes/status/get_status'));               // GET /?entity_type=&entity_id=
+app.use('/api/status', require('./routes/status/update_status'));            // PATCH /
 
-// ---------------------------
-// Status Routes
-// ---------------------------
-app.use('/api/status', require('./routes/status/get_status'));
-app.use('/api/status', require('./routes/status/update_status'));
-
-// ---------------------------
-// Start Server
-// ---------------------------
+// Start server
 app.listen(port, () => console.log(`Server running on port ${port}`));

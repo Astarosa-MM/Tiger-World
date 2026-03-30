@@ -4,6 +4,7 @@ campus_name         varchar(255),
 campus_status		varchar(11) not null,
 
 primary key (campus_ID),
+unique (campus_name),
 check (campus_status in ('AVAILABLE', 'UNAVAILABLE'))
 );
 
@@ -18,6 +19,7 @@ CREATE TABLE building (
         REFERENCES campus(campus_ID)
         ON DELETE CASCADE,
 
+    UNIQUE (campus_ID, building_name),
     CHECK (building_status IN ('AVAILABLE', 'UNAVAILABLE'))
 );
 

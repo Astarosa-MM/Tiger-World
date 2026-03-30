@@ -1,82 +1,59 @@
-const express = require("express");
+// routes/insert_campusDiagram/04_insert_floor.js
+const express = require('express');
 const router = express.Router();
 
-// POST /buildings/:buildingId/floors
-router.post("/buildings/:buildingId/floors", async (req, res) => {
+// POST /api/insert/floor
+router.post("/", async (req, res) => {
+  console.log("=== INSERT FLOOR HIT ===");
+
   const db = req.app.locals.db;
-  const connection = await db.getConnection();
-  await connection.beginTransaction();
+  const { campus_name, building_name } = req.body;
+
+  if (!campus_name || !building_name) {
+    return res.status(400).json({ error: "campus_name and building_name are required" });
+  }
 
   try {
-    const buildingId = Number(req.params.buildingId);
-    let { floor_number, floor_status } = req.body;
+    // 1) Get campus_ID
+    const [campusRows] = await db.execute(
+      "SELECT campus_ID FROM campus WHERE LOWER(campus_name) = LOWER(?)",
+      [campus_name]
+    );
+    if (!campusRows.length) return res.status(404).json({ error: `Campus '${campus_name}' not found` });
 
-    // ---------------------------------------------
-    // 1) Validate required input
-    // ---------------------------------------------
-    if (floor_number === undefined || isNaN(floor_number)) {
-      return res.status(400).json({ error: "floor_number is required and must be a number" });
-    }
+    const campus_ID = campusRows[0].campus_ID;
 
-    floor_number = Number(floor_number); // ensure numeric
+    // 2) Get building_ID
+    const [buildingRows] = await db.execute(
+      "SELECT building_ID FROM building WHERE campus_ID = ? AND LOWER(building_name) = LOWER(?)",
+      [campus_ID, building_name]
+    );
+    if (!buildingRows.length) return res.status(404).json({ error: `Building '${building_name}' not found` });
 
-    if (!["AVAILABLE", "UNAVAILABLE"].includes(floor_status)) {
-      return res.status(400).json({
-        error: "floor_status must be 'AVAILABLE' or 'UNAVAILABLE'"
-      });
-    }
+    const building_ID = buildingRows[0].building_ID;
 
-    // ---------------------------------------------
-    // 2) Get building name (FK ensures existence,
-    //    but we need name to generate floor name)
-    // ---------------------------------------------
-    const [buildingRows] = await connection.execute(
-      `SELECT building_name FROM building WHERE building_ID = ?`,
-      [buildingId]
+    // 3) Get max floor_number for building
+    const [floorMaxRows] = await db.execute(
+      "SELECT IFNULL(MAX(floor_number), 0) AS max_floor FROM floor WHERE building_ID = ?",
+      [building_ID]
+    );
+    const nextFloorNumber = floorMaxRows[0].max_floor + 1;
+
+    // 4) Insert new floor
+    const [result] = await db.execute(
+      "INSERT INTO floor (building_ID, floor_number, name, floor_status) VALUES (?, ?, ?, 'AVAILABLE')",
+      [building_ID, nextFloorNumber, `Floor ${nextFloorNumber}`]
     );
 
-    if (buildingRows.length === 0) {
-      return res.status(404).json({ error: "Building not found" });
-    }
-
-    const buildingName = buildingRows[0].building_name.trim();
-    const floorName = `${buildingName} - Floor ${floor_number}`;
-
-    // ---------------------------------------------
-    // 3) Insert floor
-    // ---------------------------------------------
-    const [result] = await connection.execute(
-      `INSERT INTO floor (building_ID, floor_number, name, floor_status)
-       VALUES (?, ?, ?, ?)`,
-      [buildingId, floor_number, floorName, floor_status]
-    );
-
-    await connection.commit();
-
-    return res.status(201).json({
+    res.status(201).json({
       message: "Floor inserted successfully",
-      floor: {
-        floor_ID: result.insertId,
-        building_ID: buildingId,
-        floor_number,
-        name: floorName,
-        floor_status
-      }
+      floor_ID: result.insertId,
+      floor_number: nextFloorNumber
     });
 
   } catch (err) {
-    await connection.rollback();
-
-    // Handle duplicate (building_ID, floor_number)
-    if (err.code === "ER_DUP_ENTRY") {
-      return res.status(409).json({
-        error: "Floor number already exists for this building"
-      });
-    }
-
-    return res.status(400).json({ error: err.message });
-  } finally {
-    connection.release();
+    console.error("INSERT FLOOR ERROR:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 

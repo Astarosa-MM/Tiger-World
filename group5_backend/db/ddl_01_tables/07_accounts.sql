@@ -5,6 +5,7 @@ password_salt		varchar(16),
 password_hash		char(64),
 
 primary key (user_ID),
+unique (email, password_hash),
 check (email like '%.edu')
 );
 

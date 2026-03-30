@@ -1,82 +1,68 @@
 const express = require("express");
 const router = express.Router();
 
-// POST /floors/:floorId/rooms
-router.post("/floors/:floorId/rooms", async (req, res) => {
+// POST /api/insert/room
+router.post("/", async (req, res) => {
   const db = req.app.locals.db;
   const connection = await db.getConnection();
   await connection.beginTransaction();
 
   try {
-    const floorId = Number(req.params.floorId);
-    let { room_number, room_classification, room_status } = req.body;
+    console.log("REQ BODY:", req.body);
 
-    // ---------------------------------------------
-    // 1) Validate required input
-    // ---------------------------------------------
-    if (room_number === undefined || isNaN(room_number)) {
-      return res.status(400).json({ error: "room_number is required and must be a number" });
+    let { campus_name, building_name, floor_number, room_number, room_classification } = req.body;
+
+    if (!campus_name || !building_name || floor_number === undefined || room_number === undefined) {
+      throw new Error("campus_name, building_name, floor_number, and room_number are required");
     }
-    room_number = Number(room_number);
+
+    campus_name = campus_name.trim();
+    building_name = building_name.trim();
+    room_classification = room_classification?.toUpperCase();
 
     const allowedClassifications = ["CLASSROOM", "FOOD", "RESTROOM", "LAB"];
     if (!allowedClassifications.includes(room_classification)) {
-      return res.status(400).json({
-        error: `room_classification must be one of ${allowedClassifications.join(", ")}`
-      });
+      throw new Error(`room_classification must be one of ${allowedClassifications.join(", ")}`);
     }
 
-    if (!["AVAILABLE", "UNAVAILABLE"].includes(room_status)) {
-      return res.status(400).json({
-        error: "room_status must be 'AVAILABLE' or 'UNAVAILABLE'"
-      });
-    }
-
-    // ---------------------------------------------
-    // 2) Validate floor exists
-    // ---------------------------------------------
-    const [floorRows] = await connection.execute(
-      `SELECT floor_ID FROM floor WHERE floor_ID = ?`,
-      [floorId]
+    const [rows] = await connection.execute(
+      `
+      SELECT f.floor_ID
+      FROM floor f
+      JOIN building b ON f.building_ID = b.building_ID
+      JOIN campus c ON b.campus_ID = c.campus_ID
+      WHERE LOWER(c.campus_name) = LOWER(?)
+        AND LOWER(b.building_name) = LOWER(?)
+        AND f.floor_number = ?
+      `,
+      [campus_name, building_name, floor_number]
     );
 
-    if (floorRows.length === 0) {
-      return res.status(404).json({ error: "Floor not found" });
+    if (rows.length === 0) {
+      throw new Error("Floor not found");
     }
 
-    // ---------------------------------------------
-    // 3) Insert room
-    // ---------------------------------------------
-    const [result] = await connection.execute(
+    const floor_ID = rows[0].floor_ID;
+
+    await connection.execute(
       `INSERT INTO room (floor_ID, room_number, room_classification, room_status)
-       VALUES (?, ?, ?, ?)`,
-      [floorId, room_number, room_classification, room_status]
+       VALUES (?, ?, ?, 'AVAILABLE')`,
+      [floor_ID, Number(room_number), room_classification]
     );
 
     await connection.commit();
 
-    return res.status(201).json({
-      message: "Room inserted successfully",
-      room: {
-        room_ID: result.insertId,
-        floor_ID: floorId,
-        room_number,
-        room_classification,
-        room_status
-      }
+    res.status(201).json({
+      message: `Room ${room_number} added to Floor ${floor_number}`
     });
 
   } catch (err) {
     await connection.rollback();
-
-    // Handle duplicate (floor_ID, room_number)
     if (err.code === "ER_DUP_ENTRY") {
-      return res.status(409).json({
-        error: "Room number already exists on this floor"
-      });
+      return res.status(409).json({ error: "Room number already exists on this floor" });
     }
-
-    return res.status(400).json({ error: err.message });
+    console.error("INSERT ROOM ERROR:", err);
+    res.status(400).json({ error: err.message });
   } finally {
     connection.release();
   }

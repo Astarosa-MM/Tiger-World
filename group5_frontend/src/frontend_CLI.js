@@ -17,6 +17,8 @@ import { printRooms } from './services/print_roomService.js';
 import { insertHallway } from './services/insert_hallwayService.js';
 import { printHallways } from './services/print_hallwayService.js';
 
+import { insertElevator } from './services/insert_elevatorService.js';
+
 //console.log("USING INSERT FLOOR SERVICE:", insertFloor.toString());
 
 const rl = readline.createInterface({
@@ -58,6 +60,7 @@ async function printMenu() {
   console.log('11) Print Room(s)');
   console.log('13) Insert Hallway');
   console.log('14) Print Hallway(s)');
+  console.log('15) Insert Elevator');
   console.log('0) Exit');
 
   const choice = await ask('Choose an action: ');
@@ -68,13 +71,14 @@ async function printMenu() {
     case '3': await dropCampusPrompt(); break;
     case '4': await insertBuildingPrompt(); break;
     case '5': await printBuildingsPrompt(); break;
-    case '6': await dropBuildingPrompt(); break;
+    //case '6': await dropBuildingPrompt(); break;
     case '7': await insertFloorPrompt(); break;
     case '8': await printFloorsPrompt(); break;
     case '10': await insertRoomPrompt(); break;
     case '11': await printRoomsPrompt(); break;
     case '13': await insertHallwayPrompt(); break;
     case '14': await printHallwaysPrompt(); break;
+    case '15': await insertElevatorPrompt(); break;
     case '0': rl.close(); return;
     default: console.log('Invalid choice.');
   }
@@ -267,6 +271,36 @@ async function printHallwaysPrompt() {
         console.log(`${h.hallway_ID} | ${h.hallway_name} | ${h.status}`)
       );
     }
+
+  } catch (err) {
+    console.error("Error:", err.message);
+  }
+}
+
+// ===== ELEVATOR / TRANSPORT SHAFT =====
+async function insertElevatorPrompt() {
+  try {
+    const campus_name = (await ask('Enter campus name: ')).trim();
+    const building_name = (await ask('Enter building name: ')).trim();
+
+    let transport_type = (await ask('Enter type (ELEVATOR/STAIR): '))
+      .toUpperCase()
+      .trim();
+
+    if (!["ELEVATOR", "STAIR"].includes(transport_type)) {
+      throw new Error("transport_type must be ELEVATOR or STAIR");
+    }
+
+    const result = await insertElevator({
+      campus_name,
+      building_name,
+      transport_type
+    });
+
+    console.log("Success:", result.message);
+    console.log(
+      `Created: ${result.shaft.name} (ID: ${result.shaft.shaft_ID})`
+    );
 
   } catch (err) {
     console.error("Error:", err.message);

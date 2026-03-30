@@ -42,16 +42,19 @@ CREATE TABLE floor (
 );
 
 CREATE TABLE transport_shaft (
-    shaft_ID       BIGINT UNSIGNED AUTO_INCREMENT,
-    building_ID    BIGINT UNSIGNED NOT NULL,
-    transport_type VARCHAR(8) NOT NULL,
-    name           VARCHAR(255) NOT NULL,
+    shaft_ID         BIGINT UNSIGNED AUTO_INCREMENT,
+    building_ID      BIGINT UNSIGNED NOT NULL,
+    transport_type   VARCHAR(8) NOT NULL,
+    transport_number BIGINT UNSIGNED NOT NULL,
+    name             VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (shaft_ID),
 
     FOREIGN KEY (building_ID)
         REFERENCES building(building_ID)
         ON DELETE CASCADE,
+
+    UNIQUE (building_ID, transport_type, transport_number),
 
     CHECK (transport_type IN ('ELEVATOR', 'STAIR'))
 );

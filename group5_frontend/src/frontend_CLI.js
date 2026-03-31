@@ -19,6 +19,8 @@ import { printHallways } from './services/print_hallwayService.js';
 
 import { insertElevator } from './services/insert_elevatorService.js';
 
+import { insertElevatorStop } from "./services/insert_elevatorstopService.js";
+
 //console.log("USING INSERT FLOOR SERVICE:", insertFloor.toString());
 
 const rl = readline.createInterface({
@@ -61,6 +63,7 @@ async function printMenu() {
   console.log('13) Insert Hallway');
   console.log('14) Print Hallway(s)');
   console.log('15) Insert Elevator');
+  console.log('16) Insert Elevator Stop');
   console.log('0) Exit');
 
   const choice = await ask('Choose an action: ');
@@ -79,6 +82,7 @@ async function printMenu() {
     case '13': await insertHallwayPrompt(); break;
     case '14': await printHallwaysPrompt(); break;
     case '15': await insertElevatorPrompt(); break;
+    case '16': await insertElevatorStopPrompt(); break;
     case '0': rl.close(); return;
     default: console.log('Invalid choice.');
   }
@@ -304,6 +308,98 @@ async function insertElevatorPrompt() {
 
   } catch (err) {
     console.error("Error:", err.message);
+  }
+}
+
+async function insertElevatorStopPrompt() {
+  try {
+    // 1) Ask for campus & building
+    const campus_name = (await ask('Enter campus name: ')).trim();
+    const building_name = (await ask('Enter building name: ')).trim();
+
+    // 2) Get building_ID
+    const db = globalDb || (await import('./db.js')).default; // adjust as needed
+    const connection = await db.getConnection();
+
+    const [campusRows] = await connection.execute(
+      "SELECT campus_ID FROM campus WHERE LOWER(campus_name) = LOWER(?)",
+      [campus_name]
+    );
+    if (!campusRows.length) {
+      console.error(`Campus '${campus_name}' not found`);
+      connection.release();
+      return;
+    }
+    const campus_ID = campusRows[0].campus_ID;
+
+    const [buildingRows] = await connection.execute(
+      "SELECT building_ID FROM building WHERE campus_ID = ? AND LOWER(building_name) = LOWER(?)",
+      [campus_ID, building_name]
+    );
+    if (!buildingRows.length) {
+      console.error(`Building '${building_name}' not found`);
+      connection.release();
+      return;
+    }
+    const building_ID = buildingRows[0].building_ID;
+
+    // 3) Elevator/stair number
+    const elevator_number = parseNumber(await ask('Enter elevator/stair number: '), 'elevator/stair');
+
+    // 4) Lookup shaft_ID
+    const [shaftRows] = await connection.execute(
+      `SELECT shaft_ID, name FROM transport_shaft WHERE building_ID = ? AND transport_number = ?`,
+      [building_ID, elevator_number]
+    );
+    if (!shaftRows.length) {
+      console.error(`Elevator/stair number ${elevator_number} not found in building ${building_name}`);
+      connection.release();
+      return;
+    }
+    const shaftId = shaftRows[0].shaft_ID;
+    const shaftName = shaftRows[0].name;
+
+    // 5) Floor numbers to add stops
+    const floorInput = (await ask('Enter floor numbers to add stops on (comma-separated): ')).trim();
+    const floor_numbers = floorInput.split(',').map(f => parseInt(f.trim(), 10));
+    if (!floor_numbers.length || floor_numbers.some(isNaN)) {
+      console.error('Invalid floor numbers');
+      connection.release();
+      return;
+    }
+
+    // 6) Auto-fill gaps
+    const autoFillInput = (await ask('Auto-fill gaps? (y/n): ')).trim().toLowerCase();
+    const auto_fill = autoFillInput === 'y';
+
+    // 7) Lookup floor IDs
+    const placeholders = floor_numbers.map(() => '?').join(',');
+    const [floorRows] = await connection.execute(
+      `SELECT floor_id, floor_number FROM floor WHERE building_id = ? AND floor_number IN (${placeholders})`,
+      [building_ID, ...floor_numbers]
+    );
+
+    if (floorRows.length !== floor_numbers.length) {
+      console.error('One or more floors do not exist in this building');
+      connection.release();
+      return;
+    }
+    const floor_ids = floorRows.map(f => f.floor_id);
+
+    // 8) Insert stops via API
+    const axiosRes = await insertElevatorStop({
+      shaftId,
+      floor_ids,
+      auto_fill
+    });
+
+    console.log('Success:', axiosRes.message);
+    if (axiosRes.warning) console.warn('Warning:', axiosRes.warning);
+
+    connection.release();
+
+  } catch (err) {
+    console.error('Error inserting elevator stops:', err.message);
   }
 }
 

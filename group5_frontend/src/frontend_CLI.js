@@ -23,6 +23,8 @@ import { insertElevatorStop } from "./services/insert_elevatorstopService.js";
 
 import { insertZone } from "./services/insert_zoneService.js";
 
+import { assignRoomsToZone } from "./services/insert_roomzone_associationService.js";
+
 //console.log("USING INSERT FLOOR SERVICE:", insertFloor.toString());
 
 const rl = readline.createInterface({
@@ -67,6 +69,7 @@ async function printMenu() {
   console.log('15) Insert Elevator');
   console.log('16) Insert Elevator Stop');
   console.log('17) Insert Zone');
+  console.log('18) Assign Room to Zone');
   console.log('0) Exit');
 
   const choice = await ask('Choose an action: ');
@@ -87,6 +90,7 @@ async function printMenu() {
     case '15': await insertElevatorPrompt(); break;
     case '16': await insertElevatorStopPrompt(); break;
     case '17': await insertZonePrompt(); break;
+    case '18': await insertZoneRoomPrompt(); break;
     case '0': rl.close(); return;
     default: console.log('Invalid choice.');
   }
@@ -424,6 +428,42 @@ async function insertZonePrompt() {
     });
 
     console.log("Success:", result.message);
+
+  } catch (err) {
+    console.error("Error:", err.message);
+  }
+}
+
+async function insertZoneRoomPrompt() {
+  try {
+    console.log("=== Assign Rooms to Zone ===");
+
+    const campus_name = (await ask("Enter campus name: ")).trim();
+    const building_name = (await ask("Enter building name: ")).trim();
+    const floor_number = parseNumber(await ask("Enter floor number: "), "floor");
+    const zone_number = parseNumber(await ask("Enter zone number: "), "zone");
+
+    const roomsInput = (await ask(
+      "Enter room numbers (comma-separated if multiple): "
+    )).trim();
+
+    if (!roomsInput) throw new Error("At least one room number is required");
+
+    const room_numbers = roomsInput
+      .split(",")
+      .map(r => parseNumber(r.trim(), "room"));
+
+    const result = await assignRoomsToZone({
+      campus_name,
+      building_name,
+      floor_number,
+      zone_number,
+      room_numbers
+    });
+
+    console.log("Success:", result.message);
+    console.log("Zone number:", result.zone_number);
+    console.log("Rooms assigned:", result.room_numbers.join(", "));
 
   } catch (err) {
     console.error("Error:", err.message);

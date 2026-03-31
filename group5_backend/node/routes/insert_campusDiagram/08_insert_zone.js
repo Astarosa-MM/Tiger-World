@@ -1,80 +1,87 @@
 const express = require("express");
 const router = express.Router();
 
-// POST /floors/:floorId/zones
-router.post("/floors/:floorId/zones", async (req, res) => {
+// POST /api/insert/zone
+router.post("/", async (req, res) => {
   const db = req.app.locals.db;
   const connection = await db.getConnection();
   await connection.beginTransaction();
 
   try {
-    const floorId = Number(req.params.floorId);
-    let { zone_number, name, zone_status } = req.body;
+    console.log("REQ BODY:", req.body);
 
-    // ---------------------------------------------
-    // 1) Validate input
-    // ---------------------------------------------
-    if (zone_number === undefined || isNaN(zone_number)) {
-      return res.status(400).json({ error: "zone_number is required and must be a number" });
-    }
-    zone_number = Number(zone_number);
+    let { campus_name, building_name, floor_number, zone_number, name } = req.body;
 
-    if (!name || name.trim() === "") {
-      return res.status(400).json({ error: "name is required" });
+    // -------------------------
+    // Validation
+    // -------------------------
+    if (
+      !campus_name ||
+      !building_name ||
+      floor_number === undefined ||
+      zone_number === undefined ||
+      !name
+    ) {
+      throw new Error(
+        "campus_name, building_name, floor_number, zone_number, and name are required"
+      );
     }
+
+    campus_name = campus_name.trim();
+    building_name = building_name.trim();
     name = name.trim();
 
-    if (!["AVAILABLE", "UNAVAILABLE"].includes(zone_status)) {
-      return res.status(400).json({
-        error: "zone_status must be 'AVAILABLE' or 'UNAVAILABLE'"
-      });
-    }
-
-    // ---------------------------------------------
-    // 2) Validate floor exists
-    // ---------------------------------------------
-    const [floorRows] = await connection.execute(
-      `SELECT floor_ID FROM floor WHERE floor_ID = ?`,
-      [floorId]
+    // -------------------------
+    // Resolve floor_ID
+    // -------------------------
+    const [rows] = await connection.execute(
+      `
+      SELECT f.floor_ID
+      FROM floor f
+      JOIN building b ON f.building_ID = b.building_ID
+      JOIN campus c ON b.campus_ID = c.campus_ID
+      WHERE LOWER(c.campus_name) = LOWER(?)
+        AND LOWER(b.building_name) = LOWER(?)
+        AND f.floor_number = ?
+      `,
+      [campus_name, building_name, floor_number]
     );
 
-    if (floorRows.length === 0) {
-      return res.status(404).json({ error: "Floor not found" });
+    if (rows.length === 0) {
+      throw new Error("Floor not found");
     }
 
-    // ---------------------------------------------
-    // 3) Insert zone
-    // ---------------------------------------------
-    const [result] = await connection.execute(
-      `INSERT INTO zone (floor_ID, zone_number, name, zone_status)
-       VALUES (?, ?, ?, ?)`,
-      [floorId, zone_number, name, zone_status]
+    const floor_ID = rows[0].floor_ID;
+
+    // -------------------------
+    // Insert zone
+    // -------------------------
+    await connection.execute(
+      `
+      INSERT INTO zone (floor_ID, zone_number, name, zone_status)
+      VALUES (?, ?, ?, 'AVAILABLE')
+      `,
+      [floor_ID, Number(zone_number), name]
     );
 
     await connection.commit();
 
-    return res.status(201).json({
-      message: "Zone inserted successfully",
-      zone: {
-        zone_ID: result.insertId,
-        floor_ID: floorId,
-        zone_number,
-        name,
-        zone_status
-      }
+    res.status(201).json({
+      message: `Zone ${zone_number} added to Floor ${floor_number}`
     });
 
   } catch (err) {
     await connection.rollback();
 
-    // Handle duplicate (floor_ID, zone_number)
     if (err.code === "ER_DUP_ENTRY") {
       return res.status(409).json({
         error: "Zone number already exists on this floor"
       });
     }
 
-    return res.status(400).json({ error: err.message });
+    console.error("INSERT ZONE ERROR:", err);
+    res.status(400).json({ error: err.message });
+
   } finally {
     connection.release();
   }

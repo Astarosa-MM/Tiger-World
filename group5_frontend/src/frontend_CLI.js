@@ -21,6 +21,8 @@ import { insertElevator } from './services/insert_elevatorService.js';
 
 import { insertElevatorStop } from "./services/insert_elevatorstopService.js";
 
+import { insertZone } from "./services/insert_zoneService.js";
+
 //console.log("USING INSERT FLOOR SERVICE:", insertFloor.toString());
 
 const rl = readline.createInterface({
@@ -64,6 +66,7 @@ async function printMenu() {
   console.log('14) Print Hallway(s)');
   console.log('15) Insert Elevator');
   console.log('16) Insert Elevator Stop');
+  console.log('17) Insert Zone');
   console.log('0) Exit');
 
   const choice = await ask('Choose an action: ');
@@ -83,6 +86,7 @@ async function printMenu() {
     case '14': await printHallwaysPrompt(); break;
     case '15': await insertElevatorPrompt(); break;
     case '16': await insertElevatorStopPrompt(); break;
+    case '17': await insertZonePrompt(); break;
     case '0': rl.close(); return;
     default: console.log('Invalid choice.');
   }
@@ -400,6 +404,29 @@ async function insertElevatorStopPrompt() {
 
   } catch (err) {
     console.error('Error inserting elevator stops:', err.message);
+  }
+}
+
+async function insertZonePrompt() {
+  try {
+    const campus_name = (await ask('Enter campus name: ')).trim();
+    const building_name = (await ask('Enter building name: ')).trim();
+    const floor_number = parseNumber(await ask('Enter floor number: '), 'floor');
+    const zone_number = parseNumber(await ask('Enter zone number: '), 'zone');
+    const name = (await ask('Enter zone name: ')).trim();
+
+    const result = await insertZone({
+      campus_name,
+      building_name,
+      floor_number,
+      zone_number,
+      name
+    });
+
+    console.log("Success:", result.message);
+
+  } catch (err) {
+    console.error("Error:", err.message);
   }
 }
 

@@ -37,6 +37,7 @@ app.use('/api/insert/elevator', require('./routes/insert_campusDiagram/03_insert
 app.use('/api/insert', require('./routes/insert_campusDiagram/07_insert_elevatorstop'));
 app.use('/api/insert/zone', require('./routes/insert_campusDiagram/08_insert_zone'));
 app.use('/api/insert/zone-room', require('./routes/insert_campusDiagram/09_insert_roomzone_association'));
+app.use('/api/insert/connection', require('./routes/insert_campusDiagram/10_insert_connection'));
 
 // -----------------------------
 // PRINT ROUTES (normalized)

@@ -25,6 +25,9 @@ import { insertZone } from "./services/insert_zoneService.js";
 
 import { assignRoomsToZone } from "./services/insert_roomzone_associationService.js";
 
+import { insertConnection } from "./services/insert_connectionService.js";
+
+
 //console.log("USING INSERT FLOOR SERVICE:", insertFloor.toString());
 
 const rl = readline.createInterface({
@@ -70,6 +73,7 @@ async function printMenu() {
   console.log('16) Insert Elevator Stop');
   console.log('17) Insert Zone');
   console.log('18) Assign Room to Zone');
+  console.log('19) Make Connection');
   console.log('0) Exit');
 
   const choice = await ask('Choose an action: ');
@@ -91,6 +95,7 @@ async function printMenu() {
     case '16': await insertElevatorStopPrompt(); break;
     case '17': await insertZonePrompt(); break;
     case '18': await insertZoneRoomPrompt(); break;
+    case '19': await insertConnectionPrompt(); break;
     case '0': rl.close(); return;
     default: console.log('Invalid choice.');
   }
@@ -464,6 +469,77 @@ async function insertZoneRoomPrompt() {
     console.log("Success:", result.message);
     console.log("Zone number:", result.zone_number);
     console.log("Rooms assigned:", result.room_numbers.join(", "));
+
+  } catch (err) {
+    console.error("Error:", err.message);
+  }
+}
+
+async function insertConnectionPrompt() {
+  try {
+    console.log("=== Insert Connection ===");
+
+    // Step 1: Ask which type of connection you are making
+    console.log("Allowed connections:\n" +
+      "- ROOM ↔ ROOM\n" +
+      "- ROOM ↔ HALLWAY\n" +
+      "- ROOM ↔ STOP\n" +
+      "- HALLWAY ↔ HALLWAY\n" +
+      "- HALLWAY ↔ STOP\n" +
+      "- ROOM/HALLWAY/STOP ↔ CAMPUS\n" +
+      "- STOP ↔ STOP (same shaft)"
+    );
+
+    async function collectNodeDetails(nodeLabel) {
+      console.log(`--- ${nodeLabel} ---`);
+      const type = (await ask("Node type (ROOM/HALLWAY/STOP/CAMPUS): ")).toUpperCase().trim();
+
+      // Campus only needs name
+      if (type === "CAMPUS") {
+        const campus_name = (await ask("Campus name: ")).trim();
+        return { type, name: campus_name };
+      }
+
+      // Others need campus + building
+      const campus_name = (await ask("Campus name: ")).trim();
+      const building_name = (await ask("Building name: ")).trim();
+
+      // Floor info
+      const floor = parseNumber(await ask("Floor number: "), "Floor number");
+
+      // Node-specific info
+      let name = null, number = null;
+      if (type === "ROOM") {
+        number = parseNumber(await ask("Room number: "), "Room number");
+      } else if (type === "HALLWAY") {
+        name = (await ask("Hallway name: ")).trim();
+      } else if (type === "STOP") {
+        name = (await ask("Transport type (ELEVATOR/STAIR): ")).trim().toUpperCase();
+        number = parseNumber(await ask("Transport stop number: "), "Stop number");
+      }
+
+      return { type, campus_name, building_name, floor, name, number };
+    }
+
+    const ownerA = await collectNodeDetails("First node");
+    const ownerB = await collectNodeDetails("Second node");
+
+    // Build payload for backend
+    const payload = {
+      campus_name: ownerA.campus_name || ownerB.campus_name || null,
+      building_name: ownerA.building_name || ownerB.building_name || null,
+      ownerA_type: ownerA.type,
+      ownerA_name: ownerA.name,
+      ownerA_number: ownerA.number,
+      ownerA_floor: ownerA.floor,
+      ownerB_type: ownerB.type,
+      ownerB_name: ownerB.name,
+      ownerB_number: ownerB.number,
+      ownerB_floor: ownerB.floor
+    };
+
+    const result = await insertConnection(payload);
+    console.log("Success:", result.message);
 
   } catch (err) {
     console.error("Error:", err.message);

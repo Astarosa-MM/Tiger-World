@@ -1,216 +1,134 @@
 const express = require("express");
 const router = express.Router();
 
-const NODE_TYPES = ["ROOM", "HALLWAY", "STOP", "CAMPUS"];
-
-const NODE_META = {
-  ROOM: { table: "room", idColumn: "room_ID" },
-  HALLWAY: { table: "hallway", idColumn: "hallway_ID" },
-  STOP: { table: "transport_stop", idColumn: "stop_id" },
-  CAMPUS: { table: "campus", idColumn: "campus_ID" }
-};
-
-// POST /connections
+// POST /api/insert/connection
 router.post("/", async (req, res) => {
   const db = req.app.locals.db;
   const connection = await db.getConnection();
   await connection.beginTransaction();
 
   try {
-    let { ownerA_type, ownerA_id, ownerB_type, ownerB_id } = req.body;
+    const {
+      campus_name,
+      building_name,
+      ownerA_type,
+      ownerA_name,
+      ownerA_number,
+      ownerA_floor,
+      ownerB_type,
+      ownerB_name,
+      ownerB_number,
+      ownerB_floor
+    } = req.body;
 
-    // ---------------------------------------------
-    // 1) Validate type + IDs
-    // ---------------------------------------------
-    if (!NODE_TYPES.includes(ownerA_type) || !NODE_TYPES.includes(ownerB_type)) {
-      return res.status(400).json({ error: "Invalid node type" });
-    }
+    // Helper: resolve a node to its ID (all via SQL)
+    const resolveNode = async (type, name, number, floor) => {
+      // CAMPUS only
+      if (type === "CAMPUS") {
+        const [rows] = await connection.execute(
+          "SELECT campus_ID FROM campus WHERE LOWER(campus_name)=LOWER(?)",
+          [name]
+        );
+        if (!rows.length) throw new Error(`Campus '${name}' not found`);
+        return { id: rows[0].campus_ID, campus_ID: rows[0].campus_ID };
+      }
 
-    ownerA_id = Number(ownerA_id);
-    ownerB_id = Number(ownerB_id);
-
-    if (!Number.isInteger(ownerA_id) || !Number.isInteger(ownerB_id)) {
-      return res.status(400).json({ error: "Node IDs must be integers" });
-    }
-
-    // ---------------------------------------------
-    // 2) Canonical ordering
-    // ---------------------------------------------
-    if (
-      ownerA_type > ownerB_type ||
-      (ownerA_type === ownerB_type && ownerA_id > ownerB_id)
-    ) {
-      [ownerA_type, ownerB_type] = [ownerB_type, ownerA_type];
-      [ownerA_id, ownerB_id] = [ownerB_id, ownerA_id];
-    }
-
-    // ---------------------------------------------
-    // 3) Validate existence
-    // ---------------------------------------------
-    const validateNodeExists = async (type, id) => {
-      const { table, idColumn } = NODE_META[type];
-
-      const [rows] = await connection.execute(
-        `SELECT 1 FROM ${table} WHERE ${idColumn} = ?`,
-        [id]
+      // Others need campus + building
+      const [campusRows] = await connection.execute(
+        "SELECT campus_ID FROM campus WHERE LOWER(campus_name)=LOWER(?)",
+        [campus_name]
       );
+      if (!campusRows.length) throw new Error(`Campus '${campus_name}' not found`);
+      const campus_ID = campusRows[0].campus_ID;
 
-      if (rows.length === 0) {
-        throw new Error(`${type} with ID ${id} does not exist`);
+      const [buildingRows] = await connection.execute(
+        "SELECT building_ID FROM building WHERE campus_ID=? AND LOWER(building_name)=LOWER(?)",
+        [campus_ID, building_name]
+      );
+      if (!buildingRows.length) throw new Error(`Building '${building_name}' not found`);
+      const building_ID = buildingRows[0].building_ID;
+
+      if (type === "ROOM") {
+        const [rows] = await connection.execute(
+          `SELECT r.room_ID, f.floor_ID
+           FROM room r
+           JOIN floor f ON r.floor_ID=f.floor_ID
+           WHERE f.building_ID=? AND f.floor_number=? AND r.room_number=?`,
+          [building_ID, floor, number]
+        );
+        if (!rows.length) throw new Error(`Room ${number} not found`);
+        return { id: rows[0].room_ID, floor_ID: rows[0].floor_ID, campus_ID };
       }
+
+      if (type === "HALLWAY") {
+        const [rows] = await connection.execute(
+          `SELECT h.hallway_ID, f.floor_ID
+           FROM hallway h
+           JOIN floor f ON h.floor_ID=f.floor_ID
+           WHERE f.building_ID=? AND f.floor_number=? AND LOWER(h.hallway_name)=LOWER(?)`,
+          [building_ID, floor, name]
+        );
+        if (!rows.length) throw new Error(`Hallway '${name}' not found`);
+        return { id: rows[0].hallway_ID, floor_ID: rows[0].floor_ID, campus_ID };
+      }
+
+      if (type === "STOP") {
+        const [rows] = await connection.execute(
+          `SELECT s.stop_id, s.floor_ID, s.shaft_ID
+           FROM transport_stop s
+           JOIN floor f ON s.floor_ID=f.floor_ID
+           WHERE f.building_ID=? AND f.floor_number=? AND LOWER(s.transport_type)=LOWER(?) AND s.transport_number=?`,
+          [building_ID, floor, name, number]
+        );
+        if (!rows.length) throw new Error(`Transport stop ${number} not found`);
+        return { id: rows[0].stop_id, floor_ID: rows[0].floor_ID, shaft_ID: rows[0].shaft_ID, campus_ID };
+      }
+
+      throw new Error(`Unknown type ${type}`);
     };
 
-    await validateNodeExists(ownerA_type, ownerA_id);
-    await validateNodeExists(ownerB_type, ownerB_id);
+    // Resolve both nodes
+    let A = await resolveNode(ownerA_type, ownerA_name, ownerA_number, ownerA_floor);
+    let B = await resolveNode(ownerB_type, ownerB_name, ownerB_number, ownerB_floor);
 
-    // ---------------------------------------------
-    // 4) Fetch hierarchy context
-    // ---------------------------------------------
-    const getNodeContext = async (type, id) => {
-      switch (type) {
+    let typeA = ownerA_type;
+    let typeB = ownerB_type;
+    let idA = A.id;
+    let idB = B.id;
 
-        case "ROOM":
-          const [room] = await connection.execute(`
-            SELECT r.floor_ID, f.building_ID, b.campus_ID
-            FROM room r
-            JOIN floor f ON r.floor_ID = f.floor_ID
-            JOIN building b ON f.building_ID = b.building_ID
-            WHERE r.room_ID = ?
-          `, [id]);
-          return { ...room[0], shaft_ID: null };
-
-        case "HALLWAY":
-          const [hallway] = await connection.execute(`
-            SELECT h.floor_ID, f.building_ID, b.campus_ID
-            FROM hallway h
-            JOIN floor f ON h.floor_ID = f.floor_ID
-            JOIN building b ON f.building_ID = b.building_ID
-            WHERE h.hallway_ID = ?
-          `, [id]);
-          return { ...hallway[0], shaft_ID: null };
-
-        case "STOP":
-          const [stop] = await connection.execute(`
-            SELECT s.floor_ID, s.shaft_ID, f.building_ID, b.campus_ID
-            FROM transport_stop s
-            JOIN floor f ON s.floor_ID = f.floor_ID
-            JOIN building b ON f.building_ID = b.building_ID
-            WHERE s.stop_id = ?
-          `, [id]);
-          return stop[0];
-
-        case "CAMPUS":
-          return { campus_ID: id };
-      }
-    };
-
-    const A = await getNodeContext(ownerA_type, ownerA_id);
-    const B = await getNodeContext(ownerB_type, ownerB_id);
-
-    // ---------------------------------------------
-    // 5) Enforce connection matrix rules
-    // ---------------------------------------------
-
-    // STOP ↔ CAMPUS disallowed
-    if (
-      (ownerA_type === "STOP" && ownerB_type === "CAMPUS") ||
-      (ownerA_type === "CAMPUS" && ownerB_type === "STOP")
-    ) {
-      throw new Error("STOP cannot connect directly to CAMPUS");
+    if (typeA > typeB || (typeA === typeB && idA > idB)) {
+      [typeA, typeB] = [typeB, typeA];
+      [idA, idB] = [idB, idA];
+      [A, B] = [B, A];
     }
 
-    // CAMPUS ↔ CAMPUS disallowed
-    if (ownerA_type === "CAMPUS" && ownerB_type === "CAMPUS") {
-      throw new Error("CAMPUS cannot connect to CAMPUS");
+    // Enforce rules via SQL-enforced hierarchy
+    if (typeA !== "CAMPUS" && typeB !== "CAMPUS" && A.campus_ID !== B.campus_ID)
+      throw new Error("Nodes must belong to the same campus");
+
+    if (["ROOM","HALLWAY","STOP"].includes(typeA) && ["ROOM","HALLWAY","STOP"].includes(typeB)) {
+      if (A.floor_ID !== B.floor_ID) throw new Error(`${typeA} and ${typeB} must be on the same floor`);
     }
 
-    // STOP ↔ STOP must be same shaft
-    if (ownerA_type === "STOP" && ownerB_type === "STOP") {
-      if (A.shaft_ID !== B.shaft_ID) {
-        throw new Error("Stops must belong to the same transport shaft");
-      }
-    }
+    if (typeA === "STOP" && typeB === "STOP" && A.shaft_ID !== B.shaft_ID)
+      throw new Error("Stops must belong to the same transport shaft");
 
-    // ROOM ↔ ROOM must be same floor
-    if (ownerA_type === "ROOM" && ownerB_type === "ROOM") {
-      if (A.floor_ID !== B.floor_ID) {
-        throw new Error("Rooms must be on the same floor");
-      }
-    }
-
-    // ROOM ↔ HALLWAY must be same floor
-    if (
-      (ownerA_type === "ROOM" && ownerB_type === "HALLWAY") ||
-      (ownerA_type === "HALLWAY" && ownerB_type === "ROOM")
-    ) {
-      if (A.floor_ID !== B.floor_ID) {
-        throw new Error("Room and hallway must be on same floor");
-      }
-    }
-
-    // ROOM ↔ STOP must be same floor
-    if (
-      (ownerA_type === "ROOM" && ownerB_type === "STOP") ||
-      (ownerA_type === "STOP" && ownerB_type === "ROOM")
-    ) {
-      if (A.floor_ID !== B.floor_ID) {
-        throw new Error("Room and stop must be on same floor");
-      }
-    }
-
-    // HALLWAY ↔ STOP must be same floor
-    if (
-      (ownerA_type === "HALLWAY" && ownerB_type === "STOP") ||
-      (ownerA_type === "STOP" && ownerB_type === "HALLWAY")
-    ) {
-      if (A.floor_ID !== B.floor_ID) {
-        throw new Error("Hallway and stop must be on same floor");
-      }
-    }
-
-    // HALLWAY ↔ HALLWAY must be same floor
-    if (ownerA_type === "HALLWAY" && ownerB_type === "HALLWAY") {
-      if (A.floor_ID !== B.floor_ID) {
-        throw new Error("Hallways must be on same floor");
-      }
-    }
-
-    // Any non-campus connection must share campus
-    if (
-      ownerA_type !== "CAMPUS" &&
-      ownerB_type !== "CAMPUS"
-    ) {
-      if (A.campus_ID !== B.campus_ID) {
-        throw new Error("Nodes must belong to the same campus");
-      }
-    }
-
-    // ---------------------------------------------
-    // 6) Insert connection
-    // ---------------------------------------------
+    // Insert
     await connection.execute(
-      `
-      INSERT INTO connection
-      (ownerA_type, ownerA_id, ownerB_type, ownerB_id)
-      VALUES (?, ?, ?, ?)
-      `,
-      [ownerA_type, ownerA_id, ownerB_type, ownerB_id]
+      `INSERT INTO connection (ownerA_type, ownerA_id, ownerB_type, ownerB_id)
+       VALUES (?, ?, ?, ?)`,
+      [typeA, idA, typeB, idB]
     );
 
     await connection.commit();
-
     return res.status(201).json({
       message: "Connection inserted successfully",
-      connection: { ownerA_type, ownerA_id, ownerB_type, ownerB_id }
+      connection: { ownerA_type: typeA, ownerA_id: idA, ownerB_type: typeB, ownerB_id: idB }
     });
 
   } catch (err) {
     await connection.rollback();
-
-    if (err.code === "ER_DUP_ENTRY") {
-      return res.status(409).json({ error: "Connection already exists" });
-    }
-
+    if (err.code === "ER_DUP_ENTRY") return res.status(409).json({ error: "Connection already exists" });
     return res.status(400).json({ error: err.message });
   } finally {
     connection.release();

@@ -1,7 +1,7 @@
-import { IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItemDivider, IonLabel, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
 import './Tab2.css';
-import { globe, searchCircle } from 'ionicons/icons';
+import { arrowForward, calendar, globe, searchCircle, settings } from 'ionicons/icons';
 
 const Tab2: React.FC = () => {
   return (
@@ -18,14 +18,27 @@ const Tab2: React.FC = () => {
           </IonToolbar>
         </IonHeader>
 
+
         <IonFab vertical="top" horizontal="center" slot="fixed">
+          <IonButton href="settings" color="tertiary" size="small">
+            <IonIcon icon={settings}></IonIcon>
+          </IonButton>
+
+          <IonButton href="calendar" color="tertiary" size="small">
+            <IonIcon icon={calendar}></IonIcon>
+          </IonButton>
+        
           <IonSearchbar color="tertiary" placeholder="Search by Location..."></IonSearchbar>
         </IonFab>
 
-        <IonFab vertical="bottom" horizontal="center" slot="fixed">
-          <IonFabButton href="tab3" color="tertiary" translucent={true}>
-            <IonIcon icon={globe} > </IonIcon>
-          </IonFabButton>
+        <IonFab color="tertiary" vertical="bottom" horizontal="center" slot="fixed">
+          <IonLabel><h1>Facility Services Building</h1></IonLabel>
+          <IonLabel><p>Facility Services Building, Engineering Lane</p></IonLabel>
+          <IonLabel><p>Baton Rouge, LA 70803</p></IonLabel>
+          <IonButton href="tab3" color="tertiary">
+            <IonLabel>More...</IonLabel>
+            <IonIcon icon={arrowForward}> </IonIcon>
+          </IonButton>
         </IonFab>
 
       </IonContent>

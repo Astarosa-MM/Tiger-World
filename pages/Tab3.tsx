@@ -39,7 +39,7 @@ const Tab3: React.FC = () => {
             </IonButton>
           </IonItem>
 
-          <IonList>
+          <IonList inset={true}>
             <IonLabel> <h1> Find a Room: </h1> </IonLabel>
             <IonItem>
               <IonLabel><p>FS 101</p></IonLabel>
@@ -57,14 +57,14 @@ const Tab3: React.FC = () => {
               <IonLabel><p>FS 221</p></IonLabel>
             </IonItem>
             <IonItem>
-              <IonLabel><p>Show more...</p></IonLabel>
-              <IonButton color="tertiary">
+              <IonLabel><p>Look Inside...</p></IonLabel>
+              <IonButton href="tab4" color="tertiary">
                 <IonIcon icon={arrowForward}></IonIcon>
               </IonButton>
             </IonItem>
           </IonList>
 
-          <IonList>
+          <IonList inset={true}>
             <IonLabel> <h1> Hours: </h1> </IonLabel>
             <IonItem>
               <IonLabel><p>Mon: 9 am - 5 pm</p></IonLabel>
@@ -86,13 +86,13 @@ const Tab3: React.FC = () => {
             </IonItem>
           </IonList> 
 
-          <IonButton color="tertiary">
-            <IonLabel><p>Get directions</p></IonLabel>
+          <IonButton href="tab2" color="tertiary">
+            <IonLabel>Get directions</IonLabel>
             <IonIcon icon={arrowForward}></IonIcon>  
           </IonButton>
 
           <IonButton color="tertiary">
-            <IonLabel><p>Is this correct? Suggest an edit</p></IonLabel>
+            <IonLabel>Is this correct? Suggest an edit</IonLabel>
             <IonIcon icon={arrowForward}></IonIcon>
           </IonButton>
 

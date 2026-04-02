@@ -2,6 +2,7 @@ import { IonButton, IonContent, IonHeader, IonIcon, IonLabel, IonPage, IonTextar
 import ExploreContainer from '../components/ExploreContainer';
 import './Tab1.css';
 import { arrowForward, eye, lockClosed } from 'ionicons/icons';
+import { useState } from 'react';
 
 const Tab1: React.FC = () => {
   return (

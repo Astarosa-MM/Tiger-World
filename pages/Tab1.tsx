@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonHeader, IonIcon, IonLabel, IonPage, IonTextarea, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonContent, IonHeader, IonIcon, IonInput, IonLabel, IonPage, IonTextarea, IonTitle, IonToolbar } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
 import './Tab1.css';
 import { arrowForward, eye, lockClosed } from 'ionicons/icons';
@@ -23,13 +23,21 @@ const Tab1: React.FC = () => {
           <h1>Log In</h1>
         </IonLabel>
 
-        <IonTextarea color="tertiary" label="University Email:" placeholder="Type here" fill="solid"></IonTextarea>
-        <IonTextarea color="tertiary" label="Password: " placeholder="Type here" fill="solid">
+        <IonInput 
+          type="email" 
+          color="tertiary" 
+          label="University Email: " 
+          placeholder="Type here" 
+          fill="solid">
+        </IonInput>
+        
+        
+        <IonInput type="password" color="tertiary" label="Password: " placeholder="Type here" fill="solid">
           <IonIcon slot="start" icon={lockClosed} aria-hidden="true"></IonIcon>
           <IonButton fill="clear" slot="end" aria-label="Show/hide">
             <IonIcon color="tertiary" slot="icon-only" icon={eye} aria-hidden="true"></IonIcon>
           </IonButton>
-        </IonTextarea>
+        </IonInput>
       
         <IonButton href="tab2" color="tertiary">
           <IonLabel>Continue: </IonLabel>

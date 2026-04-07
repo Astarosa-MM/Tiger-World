@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonHeader, IonIcon, IonicSlides, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonContent, IonHeader, IonIcon, IonicSlides, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToggle, IonToolbar } from '@ionic/react';
 import './Settings.css';
 import { arrowBack, eye, pencil, pencilOutline, pencilSharp } from 'ionicons/icons';
 
@@ -44,7 +44,7 @@ const Settings: React.FC = () => {
                 </IonItem>
                 <IonItem>
                     <IonLabel>Dark Mode: </IonLabel>
-                    <IonLabel><p>Disabled</p></IonLabel>
+                    <IonToggle color="tertiary" checked={true}></IonToggle>
                 </IonItem>
                     <IonLabel><p>Account created January 1st, 1960.</p></IonLabel>
             </IonList>

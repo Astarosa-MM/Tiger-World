@@ -24,7 +24,7 @@ const Calendar: React.FC = () => {
                 <IonIcon icon={arrowBack}></IonIcon>
             </IonButton>
        
-            <IonButton color="tertiary" >
+            <IonButton href="edit" color="tertiary" >
                 <IonIcon icon={add}></IonIcon>
                 <IonLabel>Add Class</IonLabel>
             </IonButton>

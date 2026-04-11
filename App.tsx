@@ -1,4 +1,6 @@
 import { Redirect, Route } from 'react-router-dom';
+import {APIProvider} from '@vis.gl/react-google-maps';
+
 import {
   IonApp,
   IonIcon,

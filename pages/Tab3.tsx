@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonFabButton, IonFabList, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonCol, IonContent, IonFabButton, IonFabList, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonPage, IonRow, IonTitle, IonToolbar } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
 import './Tab3.css';
 import { arrowBack, arrowForward, link } from 'ionicons/icons';
@@ -86,16 +86,29 @@ const Tab3: React.FC = () => {
             </IonItem>
           </IonList> 
 
+          <IonList>
+          <IonLabel><h1> Photos: </h1></IonLabel>
+            <IonGrid>
+              <IonRow>
+                <IonCol size="2">
+                  <IonImg src="src\photos\Img_2026_03_07_17_22_53.jpg"></IonImg>
+                </IonCol>
+                <IonCol size="2">
+                  <IonImg src="src\photos\markup_1000015354.jpg"></IonImg>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+          </IonList>
+
           <IonButton href="tab2" color="tertiary">
             <IonLabel>Get directions</IonLabel>
             <IonIcon icon={arrowForward}></IonIcon>  
           </IonButton>
 
-          <IonButton color="tertiary">
-            <IonLabel>Is this correct? Suggest an edit</IonLabel>
+          <IonButton href="test" color="tertiary">
+            <IonLabel>Is this correct? Make an edit</IonLabel>
             <IonIcon icon={arrowForward}></IonIcon>
           </IonButton>
-
 
       </IonContent>
     </IonPage>

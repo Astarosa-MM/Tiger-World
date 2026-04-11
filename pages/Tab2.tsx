@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItemDivider, IonLabel, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItemDivider, IonLabel, IonPage, IonSearchbar, IonThumbnail, IonTitle, IonToolbar } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
 import './Tab2.css';
 import { arrowForward, calendar, globe, searchCircle, settings } from 'ionicons/icons';
@@ -20,6 +20,8 @@ const Tab2: React.FC = () => {
 
 
         <IonFab vertical="top" horizontal="center" slot="fixed">
+          <IonThumbnail> <img alt="TigerWorld Logo" src="/src/photos/logonobg.png"></img></IonThumbnail>
+          
           <IonButton href="settings" color="tertiary" size="small">
             <IonIcon icon={settings}></IonIcon>
           </IonButton>
@@ -27,7 +29,7 @@ const Tab2: React.FC = () => {
           <IonButton href="calendar" color="tertiary" size="small">
             <IonIcon icon={calendar}></IonIcon>
           </IonButton>
-        
+
           <IonSearchbar color="tertiary" placeholder="Search by Location..."></IonSearchbar>
         </IonFab>
 

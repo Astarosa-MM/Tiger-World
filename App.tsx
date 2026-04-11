@@ -10,7 +10,7 @@ import {
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { ellipse, information, informationCircle, key, logoAmazon, logoWindows, server, square, triangle } from 'ionicons/icons';
+import { add, addCircle, ellipse, information, informationCircle, key, logoAmazon, logoWindows, server, square, triangle } from 'ionicons/icons';
 import Tab1 from './pages/Tab1';
 import Tab2 from './pages/Tab2';
 import Tab3 from './pages/Tab3';
@@ -18,7 +18,7 @@ import Tab4 from './pages/Tab4';
 import Settings from './pages/Settings';
 import Calendar from './pages/Calendar';
 import Edit from './pages/Edit';
-import Test from './pages/Test'
+import Test from './pages/Test';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -101,8 +101,8 @@ const App: React.FC = () => (
             <IonLabel color="tertiary">Info</IonLabel>
           </IonTabButton>
           <IonTabButton tab="test" href="/test">
-            <IonIcon aria-hidden="true" icon={informationCircle} color="tertiary" />
-            <IonLabel color="tertiary">Info</IonLabel>
+            <IonIcon aria-hidden="true" icon={addCircle} color="tertiary" />
+            <IonLabel color="tertiary">Add</IonLabel>
           </IonTabButton>
         </IonTabBar>
       </IonTabs>

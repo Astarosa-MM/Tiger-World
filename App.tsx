@@ -19,6 +19,7 @@ import Settings from './pages/Settings';
 import Calendar from './pages/Calendar';
 import Edit from './pages/Edit';
 import Test from './pages/Test';
+import SignUp from './pages/SignUp';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -70,6 +71,9 @@ const App: React.FC = () => (
           </Route>
           <Route exact path="/tab4">
             <Tab4 />
+          </Route>
+          <Route exact path="/sign-up">
+            <SignUp />
           </Route>
           <Route exact path="/settings">
             <Settings />

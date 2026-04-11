@@ -4,9 +4,24 @@ import './SignUp.css';
 import { arrowForward } from 'ionicons/icons';
 import { useState } from 'react';
 import PasswordField from './PasswordField';
+import CopyPasswordField from './CopyPasswordField';
 
 const SignUp: React.FC = () => {
+  //remember to clear passwords when switching pages
+  const [passwordInvalidText, setPasswordInvalidText] = useState("");
+  const [password, setPassword] = useState("");
 
+  const handlePassordFieldChange = (val: string) =>{
+    setPassword(val);
+    //At Least 6 Characters with at least one alphabet, one digit, and one special character
+    const passwordTest =  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{6,}$/;
+    if(passwordTest.test(val)){
+      setPasswordInvalidText("");
+    }
+    else{
+      setPasswordInvalidText("Password needs to be 6 characters with 1 letter, 1 digit, and one special character.");
+    }
+  }
   return (
     <IonPage>
       <IonHeader>
@@ -26,7 +41,7 @@ const SignUp: React.FC = () => {
         </IonLabel>
 
         <p>Enter a valid LSU email.</p>
-
+        <p className="password-invalid">{passwordInvalidText}</p>
         <IonInput 
           type="email" 
           color="tertiary" 
@@ -35,9 +50,9 @@ const SignUp: React.FC = () => {
           fill="solid">
         </IonInput>
         
-        <PasswordField/>
+        <PasswordField onPasswordFieldChange={handlePassordFieldChange}/>
 
-        <PasswordField/>
+        <CopyPasswordField/>
       
         <IonButton href="tab2" color="tertiary">
           <IonLabel>Sign Up: </IonLabel>

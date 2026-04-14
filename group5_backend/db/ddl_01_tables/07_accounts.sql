@@ -1,14 +1,3 @@
-create table user_info (
-user_ID			bigint unsigned auto_increment,
-email				varchar(255) unique,
-password_salt		varchar(16),
-password_hash		char(64),
-
-primary key (user_ID),
-unique (email, password_hash),
-check (email like '%.edu')
-);
-
 create table user_settings (
 user_ID				bigint unsigned,
 default_campus			bigint unsigned,

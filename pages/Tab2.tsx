@@ -1,6 +1,6 @@
 import { IonButton, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItemDivider, IonLabel, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
-import { arrowForward, calendar, globe, searchCircle, settings } from 'ionicons/icons';
+import { arrowForward, calendar, calendarClear, globe, searchCircle, settings } from 'ionicons/icons';
 import {APIProvider,  Map, MapCameraChangedEvent} from '@vis.gl/react-google-maps';
 import './Tab2.css';
 
@@ -27,6 +27,10 @@ const Tab2: React.FC = () => {
 
           <IonButton href="calendar" color="tertiary" size="small">
             <IonIcon icon={calendar}></IonIcon>
+          </IonButton>
+
+          <IonButton href="events" color="tertiary" size="small">
+            <IonIcon icon={calendarClear}></IonIcon>
           </IonButton>
         
           <IonSearchbar color="tertiary" placeholder="Search by Location..."></IonSearchbar>

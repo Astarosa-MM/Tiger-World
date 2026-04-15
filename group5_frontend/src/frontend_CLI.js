@@ -27,6 +27,7 @@ import { assignRoomsToZone } from "./services/insert_roomzone_associationService
 
 import { insertConnection } from "./services/insert_connectionService.js";
 
+import { exists, login, register } from "./services/login.js";
 
 //console.log("USING INSERT FLOOR SERVICE:", insertFloor.toString());
 
@@ -57,6 +58,7 @@ function parseNumber(input, fieldName) {
 // ===== MENU =====
 async function printMenu() {
   console.log('\n=== Campus Diagram Menu ===');
+  console.log('20) login page')
   console.log('1) Insert Campus');
   console.log('2) Print Campus(es)');
   console.log('3) Drop Campus');
@@ -96,6 +98,7 @@ async function printMenu() {
     case '17': await insertZonePrompt(); break;
     case '18': await insertZoneRoomPrompt(); break;
     case '19': await insertConnectionPrompt(); break;
+    case '20': await login_func(); break;
     case '0': rl.close(); return;
     default: console.log('Invalid choice.');
   }
@@ -544,6 +547,31 @@ async function insertConnectionPrompt() {
   } catch (err) {
     console.error("Error:", err.message);
   }
+}
+
+async function login_func() {
+  const email = (await ask("Enter email: ")).trim();
+
+  const existsRes = await exists(email);
+
+  if (!existsRes.exists) {
+    const create = (await ask("User not found. Create account? (y/n): "))
+      .toLowerCase();
+
+    if (create !== "y") return;
+
+    const password = await ask("Create password: ");
+    await register(email, password);
+
+    console.log("Account created. Please log in again.");
+    return;
+  }
+
+  const password = await ask("Enter password: ");
+  const res = await login(email, password);
+
+  console.log(res.message);
+  console.log("User ID:", res.user_ID);
 }
 
 // START

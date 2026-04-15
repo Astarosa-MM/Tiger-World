@@ -25,6 +25,12 @@ app.locals.db = db;
 // Basic test
 app.get('/', (req, res) => res.send('Hello Railway'));
 
+// user authentication routes
+app.use('/api/auth', require('./routes/login/01_exists'));
+app.use('/api/auth', require('./routes/login/02_login'));
+app.use('/api/auth', require('./routes/login/03_register'));
+
+
 // -----------------------------
 // INSERT ROUTES
 // -----------------------------

@@ -35,6 +35,8 @@ const Tab2: React.FC = () => {
       <APIProvider apiKey={'AIzaSyClZt4i4haW_8lgWruz9IeadaU6rig_Hfg'} onLoad={() => console.log('Maps API Loaded')}>
         <Map
             defaultZoom={13}
+            disableDefaultUI={true}
+            reuseMaps={true}
             defaultCenter={ { lat: 30.406266, lng: -91.184324 } }
             onCameraChanged={ (ev: MapCameraChangedEvent) =>
             console.log('camera changed:', ev.detail.center, 'zoom:', ev.detail.zoom)

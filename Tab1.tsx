@@ -48,6 +48,11 @@ const Tab1: React.FC = () => {
             <IonLabel>Continue: </IonLabel>
             <IonIcon icon={arrowForward}></IonIcon>
           </IonButton>
+
+        <IonButton routerLink="/sign-up" color="tertiary">
+          <IonLabel>Sign Up: </IonLabel>
+          <IonIcon icon={arrowForward}></IonIcon>
+        </IonButton>
         </IonFab>
 
       </IonContent>

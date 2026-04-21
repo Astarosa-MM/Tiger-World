@@ -1,16 +1,16 @@
 import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Tab4.css';
-import { arrowBack, arrowForward } from 'ionicons/icons';
+import { add, arrowBack, arrowForward } from 'ionicons/icons';
 
 const Tab4: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref="/"></IonBackButton>
+          <IonButtons color="tertiary" slot="start">
+            <IonBackButton defaultHref="tab3"></IonBackButton>
           </IonButtons>
-          <IonTitle>Rooms</IonTitle>
+          <IonTitle>Inside: Facility Services Building</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
@@ -19,12 +19,6 @@ const Tab4: React.FC = () => {
             <IonTitle size="large">Room list</IonTitle>
           </IonToolbar>
         </IonHeader>
-
-        <IonButton href="tab3" color="tertiary"> 
-          <IonIcon icon={arrowBack}></IonIcon>
-        </IonButton>
-
-        <IonLabel><h1>Inside: Facility Services Building</h1></IonLabel>
 
         <IonList inset={true}>
           <IonLabel><h1>Classrooms: </h1></IonLabel>
@@ -114,6 +108,11 @@ const Tab4: React.FC = () => {
             </IonButton>
           </IonItem>
         </IonList>
+
+        <IonButton color="tertiary" href="AddRoom">
+          <IonLabel>Add Room </IonLabel>
+          <IonIcon icon={add}></IonIcon>
+        </IonButton>
 
       </IonContent>
     </IonPage>

@@ -1,26 +1,15 @@
-import { IonButton, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItemDivider, IonLabel, IonPage, IonSearchbar, IonThumbnail, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItemDivider, IonLabel, IonPage, IonPopover, IonSearchbar, IonThumbnail, IonTitle, IonToolbar } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
 import './Tab2.css';
-import { arrowForward, calendar, globe, searchCircle, settings } from 'ionicons/icons';
+import { arrowForward, calendar, globe, help, pencil, searchCircle, settings } from 'ionicons/icons';
 
 const Tab2: React.FC = () => {
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Home</IonTitle>
-        </IonToolbar>
-      </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Home</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-
 
         <IonFab vertical="top" horizontal="center" slot="fixed">
-          <IonThumbnail> <img alt="TigerWorld Logo" src="/src/photos/logonobg.png"></img></IonThumbnail>
+          <IonSearchbar color="tertiary" placeholder="Search by Location..."></IonSearchbar>
           
           <IonButton href="settings" color="tertiary" size="small">
             <IonIcon icon={settings}></IonIcon>
@@ -30,7 +19,18 @@ const Tab2: React.FC = () => {
             <IonIcon icon={calendar}></IonIcon>
           </IonButton>
 
-          <IonSearchbar color="tertiary" placeholder="Search by Location..."></IonSearchbar>
+          <IonButton href="addbuilding" color="tertiary" size="small">
+            <IonIcon icon={pencil}></IonIcon>
+          </IonButton>
+          
+          <IonButton id="click-trigger" color="tertiary" size="small">
+            <IonIcon icon={help}></IonIcon>
+          </IonButton>
+
+          <IonPopover trigger="click-trigger" triggerAction="click">
+            <IonContent class="ion-padding">Click on an item on the map to see a preview, then select "more" to see additional information. You can also use the search bar to search for an item or add an event using the calendar.</IonContent>
+          </IonPopover>
+
         </IonFab>
 
         <IonFab color="tertiary" vertical="bottom" horizontal="center" slot="fixed">

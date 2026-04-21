@@ -8,17 +8,7 @@ import { useState } from 'react';
 const Tab1: React.FC = () => {
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Welcome</IonTitle>
-        </IonToolbar>
-      </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Welcome</IonTitle>
-          </IonToolbar>
-        </IonHeader>
         
         <IonFab horizontal="center" vertical="top" slot="fixed">
           <IonThumbnail>
@@ -26,7 +16,9 @@ const Tab1: React.FC = () => {
           </IonThumbnail>
         </IonFab>
         
+        
         <IonFab horizontal="center" vertical="center" slot="fixed">
+          <div className="ion-margin">
           <IonLabel >
             <h1>Log In</h1>
           </IonLabel>
@@ -37,8 +29,8 @@ const Tab1: React.FC = () => {
             placeholder="Type here" 
             fill="solid">
           </IonInput>
-        
-        
+          
+
           <IonInput type="password" color="tertiary" label="Password: " placeholder="Type here" fill="solid">
             <IonIcon slot="start" icon={lockClosed} aria-hidden="true"></IonIcon>
             <IonInputPasswordToggle color="tertiary" slot="end"></IonInputPasswordToggle>
@@ -48,13 +40,14 @@ const Tab1: React.FC = () => {
             <IonLabel>Continue: </IonLabel>
             <IonIcon icon={arrowForward}></IonIcon>
           </IonButton>
-
-        <IonButton routerLink="/sign-up" color="tertiary">
-          <IonLabel>Sign Up: </IonLabel>
-          <IonIcon icon={arrowForward}></IonIcon>
-        </IonButton>
+        
+          <IonButton routerLink="/sign-up" color="tertiary">
+            <IonLabel>Sign Up: </IonLabel>
+            <IonIcon icon={arrowForward}></IonIcon>
+          </IonButton>
+          </div>
         </IonFab>
-
+        
       </IonContent>
     </IonPage>
   );

@@ -1,27 +1,24 @@
-import { IonButton, IonCol, IonContent, IonFabButton, IonFabList, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonPage, IonRow, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
+import { IonBackButton, IonButton, IonButtons, IonCol, IonContent, IonFabButton, IonFabList, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonPage, IonRow, IonTitle, IonToolbar } from '@ionic/react';
 import './Tab3.css';
 import { arrowBack, arrowForward, link } from 'ionicons/icons';
+import { usePhotoGallery } from '../hooks/useCamera';
 
 const Tab3: React.FC = () => {
+  const { photos, addNewToGallery } = usePhotoGallery();
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Info</IonTitle>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="tab2"></IonBackButton>
+          </IonButtons>
+          <IonTitle>More...</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Info</IonTitle>
-          </IonToolbar>
-        </IonHeader>
 
-        <IonButton href="tab2" color="tertiary">
-          <IonIcon icon={arrowBack}></IonIcon>
-        </IonButton>
-
+        <div className="ion-margin">
           <IonLabel class="ion-text-wrap"> 
             <h1>Facility Services Building</h1> 
             <p>Facility Services Building, Engineering Lane</p> 
@@ -39,8 +36,8 @@ const Tab3: React.FC = () => {
             </IonButton>
           </IonItem>
 
-          <IonList inset={true}>
-            <IonLabel> <h1> Find a Room: </h1> </IonLabel>
+          <IonList inset={false}>
+            <div className="ion-margin"><IonLabel> <h1> Find a Room: </h1> </IonLabel></div>
             <IonItem>
               <IonLabel><p>FS 101</p></IonLabel>
             </IonItem>
@@ -64,8 +61,8 @@ const Tab3: React.FC = () => {
             </IonItem>
           </IonList>
 
-          <IonList inset={true}>
-            <IonLabel> <h1> Hours: </h1> </IonLabel>
+          <IonList inset={false}>
+            <div className="ion-margin"><IonLabel> <h1> Hours: </h1> </IonLabel></div>
             <IonItem>
               <IonLabel><p>Mon: 9 am - 5 pm</p></IonLabel>
             </IonItem>
@@ -87,17 +84,17 @@ const Tab3: React.FC = () => {
           </IonList> 
 
           <IonList>
-          <IonLabel><h1> Photos: </h1></IonLabel>
+            <div className="ion-margin"><IonLabel><h1> Photos: </h1></IonLabel></div>
             <IonGrid>
               <IonRow>
-                <IonCol size="2">
-                  <IonImg src="src\photos\Img_2026_03_07_17_22_53.jpg"></IonImg>
-                </IonCol>
-                <IonCol size="2">
-                  <IonImg src="src\photos\markup_1000015354.jpg"></IonImg>
-                </IonCol>
+                {photos.map((photo) => (
+                    <IonCol size="5" key={photo.filepath}>
+                      <IonImg src={photo.webviewPath} />
+                    </IonCol>
+                ))}
               </IonRow>
             </IonGrid>
+            
           </IonList>
 
           <IonButton href="tab2" color="tertiary">
@@ -105,10 +102,11 @@ const Tab3: React.FC = () => {
             <IonIcon icon={arrowForward}></IonIcon>  
           </IonButton>
 
-          <IonButton href="test" color="tertiary">
+          <IonButton color="tertiary">
             <IonLabel>Is this correct? Make an edit</IonLabel>
             <IonIcon icon={arrowForward}></IonIcon>
           </IonButton>
+          </div>
 
       </IonContent>
     </IonPage>

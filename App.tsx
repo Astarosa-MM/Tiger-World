@@ -20,6 +20,10 @@ import Calendar from './pages/Calendar';
 import Edit from './pages/Edit';
 import Test from './pages/Test';
 import SignUp from './pages/SignUp';
+import AddRoom from './pages/AddRoom';
+import AddBuilding from './pages/AddBuilding';
+import Events from './pages/Events';
+import EditEvents from './pages/EditEvents';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -81,33 +85,34 @@ const App: React.FC = () => (
           <Route exact path="/calendar">
             <Calendar />
           </Route>
-          <Route exact path="/edit">
-            <Edit />
+          <Route exact path="/events">
+            <Events />
           </Route>
+          <Route exact path="/edit" component={Edit} />
+          <Route exact path="/addbuilding" component={AddBuilding} />
+          <Route exact path="/addroom" component={AddRoom} />
           <Route exact path="/test">
             <Test />
+          </Route>
+          <Route exact path="/edit-events">
+            <EditEvents />
           </Route>
           <Route exact path="/">
             <Redirect to="/tab1" />
           </Route>
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
-          <IonTabButton tab="tab1" href="/tab1">
-            <IonIcon aria-hidden="true" icon={key} color="tertiary"/>
-            <IonLabel color="tertiary">Welcome</IonLabel>
-          </IonTabButton>
+
           <IonTabButton tab="tab2" href="/tab2">
             <IonIcon aria-hidden="true" icon={globe} color="tertiary" />
             <IonLabel color="tertiary">Home</IonLabel>
           </IonTabButton>
+          
           <IonTabButton tab="tab3" href="/tab3">
             <IonIcon aria-hidden="true" icon={information} color="tertiary" />
             <IonLabel color="tertiary">Info</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="test" href="/test">
-            <IonIcon aria-hidden="true" icon={addCircle} color="tertiary" />
-            <IonLabel color="tertiary">Add</IonLabel>
-          </IonTabButton>
+
         </IonTabBar>
       </IonTabs>
     </IonReactRouter>

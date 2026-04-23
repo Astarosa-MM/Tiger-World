@@ -1,27 +1,26 @@
-import { IonButton, IonContent, IonHeader, IonIcon, IonicSlides, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToggle, IonToolbar } from '@ionic/react';
+import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonicSlides, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToggle, IonToolbar } from '@ionic/react';
 import './Settings.css';
 import { arrowBack, eye, pencil, pencilOutline, pencilSharp } from 'ionicons/icons';
+import './PasswordField'; './CopyPasswordField';
 
 const Settings: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons color="tertiary" slot="start">
+            <IonBackButton defaultHref="tab2"></IonBackButton>
+          </IonButtons>
           <IonTitle>Settings</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Settings</IonTitle>
+            <IonTitle size="large">Profile Settings</IonTitle>
           </IonToolbar>
         </IonHeader>
-
-        <IonButton href="tab2" color="tertiary">
-            <IonIcon icon={arrowBack}></IonIcon>
-        </IonButton>
-
-        <IonLabel><h1>Profile Settings</h1></IonLabel>
+          
             <IonList>
                 <IonItem>
                     <IonLabel>Email: </IonLabel>
@@ -46,8 +45,9 @@ const Settings: React.FC = () => {
                     <IonLabel>Dark Mode: </IonLabel>
                     <IonToggle color="tertiary" checked={true}></IonToggle>
                 </IonItem>
-                    <IonLabel><p>Account created January 1st, 1960.</p></IonLabel>
+                  <div className="ion-margin"><IonLabel><p>Account created January 1st, 1960.</p></IonLabel></div>
             </IonList>
+          
       </IonContent>
     </IonPage>
   );

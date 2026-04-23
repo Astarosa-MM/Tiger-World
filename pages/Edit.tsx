@@ -1,33 +1,47 @@
-import { IonButton, IonContent, IonDatetime, IonFab, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonSelect, IonSelectOption, IonTextarea, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
+import { IonBackButton, IonButton, IonButtons, IonContent, IonDatetime, IonFab, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonSelect, IonSelectOption, IonTextarea, IonTitle, IonToolbar } from '@ionic/react';
 import './Edit.css';
 import { arrowBack, arrowForward, eye, lockClosed } from 'ionicons/icons';
 import { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 const Edit: React.FC = () => {
+
+  const [title, setTitle] = useState('');
+  const [days, setDays] = useState<string[]>([]);
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [building, setBuilding] = useState('');
+  const [room, setRoom] = useState('');
+
+  const handleCreate = () => {
+    const newClass = {
+      title, days, startTime, endTime, building, room
+    };
+    
+    const existing = JSON.parse(localStorage.getItem('classes') || '[]');
+    existing.push(newClass);
+
+    localStorage.setItem('classes', JSON.stringify(existing));
+    history.push('/calendar');
+  };
+
+  const history = useHistory();
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Add Class</IonTitle>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="calendar"></IonBackButton>
+          </IonButtons>
+          <IonTitle>Create Class: </IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Add Class</IonTitle>
-          </IonToolbar>
-        </IonHeader>
 
-        <IonButton href="calendar" color="tertiary">
-            <IonIcon icon={arrowBack}></IonIcon>
-        </IonButton>
+        <IonInput fill="solid" color="tertiary" label="Enter Class Title: " value={title} onIonChange={(e) => setTitle(e.detail.value!)}></IonInput>
 
-        <IonLabel><h1>Add Class: </h1></IonLabel>
-
-        <IonInput color="tertiary" label="Enter Class Title: " placeholder="Type here" fill="solid"></IonInput>
-
-        <IonSelect label="Enter Class Days: " multiple={true} color="tertiary" fill="solid">
+        <IonSelect fill="solid" label="Enter Class Days: " multiple={true} color="tertiary" value={days} onIonChange={(e) => setDays(e.detail.value)}>
             <IonSelectOption value="Monday">Monday</IonSelectOption>
             <IonSelectOption value="Tuesday">Tuesday</IonSelectOption>
             <IonSelectOption value="Wednesday">Wednesday</IonSelectOption>
@@ -38,18 +52,20 @@ const Edit: React.FC = () => {
         </IonSelect>
 
         <IonItem>
-          <IonInput label="Enter Start Time: " color="tertiary" type="time"><span slot="title">Enter Start Time:</span></IonInput>
-          <IonInput label="Enter End Time: " color="tertiary" type="time"><span slot="title">Enter End Time:</span></IonInput>
+          <IonInput label="Start Time: " color="tertiary" type="time" value={startTime} onIonChange={(e) => setStartTime(e.detail.value!)}><span slot="title">Enter Start Time:</span></IonInput>
+          <IonInput label="End Time: " color="tertiary" type="time" value={endTime} onIonChange={(e) => setEndTime(e.detail.value!)}><span slot="title">Enter End Time:</span></IonInput>
         </IonItem>
 
-        <IonTextarea color="tertiary" label="Enter Address: " placeholder="Type here" fill="solid"></IonTextarea>
-        <IonTextarea color="tertiary" label="Enter Room Number " placeholder="Type here" fill="solid"></IonTextarea>
+        <IonInput fill="solid" color="tertiary" label="Enter Building: " placeholder="Type here" value={building} onIonChange={(e) => setBuilding(e.detail.value!)}></IonInput>
+        <IonInput fill="solid" color="tertiary" label="Enter Room Number: " placeholder="Type here" value={room} onIonChange={(e) => setRoom(e.detail.value!)}></IonInput>
 
-        <IonButton color="tertiary">
-            <IonLabel>Enter</IonLabel>
+        <div className="ion-margin">
+          <IonButton onClick={handleCreate} color="tertiary">
+            <IonLabel>Create</IonLabel>
             <IonIcon icon={arrowForward}></IonIcon>
-        </IonButton>
-
+          </IonButton>
+        </div>
+        
       </IonContent>
     </IonPage>
   );

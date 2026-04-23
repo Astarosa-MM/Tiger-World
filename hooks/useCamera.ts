@@ -66,6 +66,27 @@ export function usePhotoGallery() {
     };
   };
 
+
+  const deletePhoto = async (photoToDelete: UserPhoto) => {
+  // 1. Delete from filesystem
+  await Filesystem.deleteFile({
+    path: photoToDelete.filepath,
+    directory: Directory.Data,
+  });
+
+  // 2. Update state
+  const updatedPhotos = photos.filter(
+    (p) => p.filepath !== photoToDelete.filepath
+  );
+  setPhotos(updatedPhotos);
+
+  // 3. Update persistent storage
+  Preferences.set({
+    key: PHOTO_STORAGE,
+    value: JSON.stringify(updatedPhotos),
+  });
+};
+
   const convertBlobToBase64 = (blob: Blob) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -80,6 +101,7 @@ export function usePhotoGallery() {
   return {
     addNewToGallery,
     photos,
+    deletePhoto
   };
 }
 

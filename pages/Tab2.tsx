@@ -1,11 +1,12 @@
-import { IonButton, IonContent, IonFab, IonIcon, IonLabel, IonPage, IonPopover, IonSearchbar } from '@ionic/react';
+import { IonButton, IonContent, IonFab, IonIcon, IonLabel, IonPage, IonPopover, IonSearchbar, IonFabButton } from '@ionic/react';
+import { add } from 'ionicons/icons';
 import './Tab2.css';
 import { arrowForward, calendar, help, pencil, settings } from 'ionicons/icons';
 import { APIProvider,  Map, MapCameraChangedEvent } from '@vis.gl/react-google-maps';
 import { useLocation } from 'react-router';
-import { Marker } from '@vis.gl/react-google-maps';
-import { useEffect, useState } from 'react';
-
+import { Marker, MapMouseEvent, useMap, useMapsLibrary, Polyline } from '@vis.gl/react-google-maps';
+import { useEffect, useState, useCallback } from 'react';
+import MapsComponents from './MapsComponents';
 
 
 const Tab2: React.FC = () => {
@@ -13,6 +14,23 @@ const Tab2: React.FC = () => {
   const selected = location.state;
   const [selectedBuilding, setSelectedBuilding] = useState<any>(null);
   
+  const handleMapClick = (e : MapMouseEvent) => {
+
+    console.log(e.detail.latLng);
+  };
+  
+
+  //const [polyline, setPolyline] = useState(null);
+
+
+  const [path, setPath] = useState([]);
+  const [routeInfo, setRouteInfo] = useState(null);
+
+
+
+  
+
+
   useEffect(() => {
     if (selected) {
       setSelectedBuilding(selected);
@@ -47,16 +65,19 @@ const Tab2: React.FC = () => {
           </IonPopover>
         </IonFab>
       
-        <APIProvider apiKey={' withheld for privacy '} onLoad={() => console.log('Maps API Loaded')}>
+        <APIProvider apiKey={' api here'} onLoad={() => console.log('Maps API Loaded')}>
           <Map
             defaultZoom={18}
-            center={
-              selected
-                ? { lat: selected.lat, lng: selected.lng }
-                : { lat: 30.406266, lng: -91.184324 }
-              }
+            defaultCenter={{lat: 30.406266, lng: -91.184324}}
+            onClick={handleMapClick}
+            // center={
+            //   selected
+            //     ? { lat: selected.lat, lng: selected.lng }
+            //     : { lat: 30.406266, lng: -91.184324 }
+            //   }
+
             >
-              {selectedBuilding?.lat && selectedBuilding?.lng && (
+              {/* {selectedBuilding?.lat && selectedBuilding?.lng && (
                 <Marker
                   position={{
                     lat: selectedBuilding.lat,
@@ -71,8 +92,23 @@ const Tab2: React.FC = () => {
                     });
                   }}
                 />
-              )}
+              )} */}
+              {/* <Marker position={markerPos1}></Marker>
+              <Marker position={markerPos2}></Marker>
+              <Polyline 
+              path={path}
+              options={{
+              strokeColor: "#4285F4",
+              strokeWeight: 5,
+            }}
+              >
+
+              </Polyline> */}
+              <MapsComponents />
             </Map>
+        
+        
+
         </APIProvider>
          
           <IonFab vertical="bottom" horizontal="center" slot="fixed">
@@ -86,6 +122,10 @@ const Tab2: React.FC = () => {
               </IonButton>
             </div>
           </IonFab>
+
+
+
+
 
 
       </IonContent>

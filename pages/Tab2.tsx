@@ -65,7 +65,7 @@ const Tab2: React.FC = () => {
           </IonPopover>
         </IonFab>
       
-        <APIProvider apiKey={' api here'} onLoad={() => console.log('Maps API Loaded')}>
+        <APIProvider apiKey={'AIzaSyBEt2zDtjYZ9PKc1E4oEti5o4_2mDBiPsI'} onLoad={() => console.log('Maps API Loaded')}>
           <Map
             defaultZoom={18}
             defaultCenter={{lat: 30.406266, lng: -91.184324}}

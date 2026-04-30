@@ -4,7 +4,7 @@ import './Tab2.css';
 import { arrowForward, calendar, help, pencil, settings } from 'ionicons/icons';
 import { APIProvider,  Map, MapCameraChangedEvent } from '@vis.gl/react-google-maps';
 import { useLocation } from 'react-router';
-import { Marker, MapMouseEvent, useMap, useMapsLibrary, Polyline } from '@vis.gl/react-google-maps';
+import { Marker, MapMouseEvent, useMap, useMapsLibrary, Polyline, InfoWindow, useMarkerRef } from '@vis.gl/react-google-maps';
 import { useEffect, useState, useCallback } from 'react';
 import MapsComponents from './MapsComponents';
 
@@ -13,10 +13,12 @@ const Tab2: React.FC = () => {
   const location = useLocation<any>();
   const selected = location.state;
   const [selectedBuilding, setSelectedBuilding] = useState<any>(null);
-  
+  const [userPos, setUserPos] = useState({lat: 0, lng: 0});
+
   const handleMapClick = (e : MapMouseEvent) => {
 
     console.log(e.detail.latLng);
+    setUserPos(e.detail.latLng);
   };
   
 
@@ -65,7 +67,7 @@ const Tab2: React.FC = () => {
           </IonPopover>
         </IonFab>
       
-        <APIProvider apiKey={'AIzaSyBEt2zDtjYZ9PKc1E4oEti5o4_2mDBiPsI'} onLoad={() => console.log('Maps API Loaded')}>
+        <APIProvider apiKey={' api here '} onLoad={() => console.log('Maps API Loaded')}>
           <Map
             defaultZoom={18}
             defaultCenter={{lat: 30.406266, lng: -91.184324}}
@@ -104,7 +106,7 @@ const Tab2: React.FC = () => {
               >
 
               </Polyline> */}
-              <MapsComponents />
+              <MapsComponents userPosition={userPos}/>
             </Map>
         
         
@@ -132,5 +134,7 @@ const Tab2: React.FC = () => {
     </IonPage>
   );
 };
+
+
 
 export default Tab2;

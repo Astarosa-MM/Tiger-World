@@ -17,22 +17,14 @@ const Tab2: React.FC = () => {
   const [userPos, setUserPos] = useState({lat: 0, lng: 0});
 
   const handleMapClick = (e : MapMouseEvent) => {
-
+    //Updates the userPosition variable in OutdoorPathfinding Component.
+    //Check comment in the OutdoorPathfinding for more context.
     console.log(e.detail.latLng);
     setUserPos(e.detail.latLng);
   };
   
 
   //const [polyline, setPolyline] = useState(null);
-
-
-  const [path, setPath] = useState([]);
-  const [routeInfo, setRouteInfo] = useState(null);
-
-
-
-  
-
 
   useEffect(() => {
     if (selected) {
@@ -68,10 +60,10 @@ const Tab2: React.FC = () => {
           </IonPopover>
         </IonFab>
       
-        <APIProvider apiKey={''} onLoad={() => console.log('Maps API Loaded')}>
+        <APIProvider apiKey={'place api here'} onLoad={() => console.log('Maps API Loaded')}>
           <Map
             defaultZoom={18}
-            defaultCenter={{lat: 30.406266, lng: -91.184324}}
+            defaultCenter={{lat: 30.410143928242466, lng: -91.17549202235222}}
             onClick={handleMapClick}
             // center={
             //   selected

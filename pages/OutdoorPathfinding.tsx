@@ -1,15 +1,18 @@
-import { IonButton, IonContent, IonFab, IonIcon, IonLabel, IonPage, IonPopover, IonSearchbar, IonFabButton } from '@ionic/react';
-import { add, locateOutline, locationOutline } from 'ionicons/icons';
+import { IonFab, IonIcon, IonFabButton } from '@ionic/react';
+import { locationOutline } from 'ionicons/icons';
 import './Tab2.css';
-import { arrowForward, calendar, help, pencil, settings } from 'ionicons/icons';
-import { APIProvider,  Map, MapCameraChangedEvent } from '@vis.gl/react-google-maps';
-import { useLocation } from 'react-router';
-import { Marker, MapMouseEvent, useMap, useMapsLibrary, Polyline } from '@vis.gl/react-google-maps';
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { Marker, useMap, useMapsLibrary, Polyline } from '@vis.gl/react-google-maps';
+import { useEffect, useState, useRef } from 'react';
 import { Geolocation, Position } from '@capacitor/geolocation'
 
 
 interface PathfindingProps {
+    //This props is used for testing purposes when
+    //trying to make sure that the pathfinding works as intended.
+    //Just click somewhere on the map and the userPosition will update there.
+    //If you want to test out the pathfinding uncomment the userPosition version of the pathfinding and
+    //comment out the position version of the pathfinding. Then replace position with userPosition with any
+    //component or variable that needs the userPosition.
     userPosition: {lat: number, lng: number};
 }
 
@@ -38,17 +41,14 @@ function getDistance(a: LatLng, b:LatLng){
 }
 
 const OutdoorPathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
-
-  const map = useMap();
   const geometry = useMapsLibrary("geometry");
   const lastFetchTime = useRef(0);
 
   const markerPos1 = {lat: 30.409662781123572, lng: -91.18212244303703};
   const markerPos2 = {lat: 30.410143928242466, lng: -91.17549202235222};
 
-  const [position, setPosition] = useState({lat: 30.409662781123572, lng: -91.18212244303703});
-  const [isPathButtonDisabled, setIsPathButtonDisabled] = useState(true);
-  const [destination, setDestination] = useState(markerPos2);
+  const [position, setPosition] = useState<LatLng>({lat: 0, lng: 0});
+  const [destination, setDestination] = useState<LatLng | null>(markerPos2);
 
 
 
@@ -56,9 +56,6 @@ const OutdoorPathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
   const [routeInfo, setRouteInfo] = useState(null);
   const [isRoutingStarted, setIsRoutingStarted] = useState(false);
   const [isLocationStarted, setIsLocationStarted] = useState(false);
-
-  const [routeStrokeWeight, setRouteStrokeWeight] = useState(5);
-
   const lastReroutePoint = useRef<LatLng | null>(null);
   const watchId = useRef<string | null>(null);
 
@@ -66,37 +63,13 @@ const OutdoorPathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
   const handleRoutingStart = (e) => {
     setIsLocationStarted(true);
     setIsRoutingStarted(true);
-    setRouteStrokeWeight(5);
     console.log("Routing Start");
   }
 
-
-
-
-// useEffect (() => {
-//   // console.log("use effect location");
-//   // if(!isLocationStarted) return;
-  
-//   const getLocation = async  () => {
-//         console.log("Getting Location");
-//         try {
-//         const coords = await Geolocation.getCurrentPosition();
-//         setPosition({
-//           lat: coords.coords.latitude,
-//           lng: coords.coords.longitude,
-//         });
-
-
-//       } catch (err) {
-//         console.error("Error getting location", err);
-//       }
-//   }
-//   getLocation();
-
-// }, [isLocationStarted])
-
-
+  //Tracks the users position 
   useEffect(() => {
+    if(!position && !isRoutingStarted) return;
+
     const startTracking = async () => {
       watchId.current = await Geolocation.watchPosition(
         {
@@ -123,35 +96,38 @@ const OutdoorPathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
         Geolocation.clearWatch({ id: watchId.current });
       }
     };
-  }, [position]);
+  }, [position, isRoutingStarted]);
 
 
-
+/////////////////////////////////
+//position version of pathfinding
+//////////////////////////////////
  useEffect(() => {
 
   if(!isRoutingStarted) return;
-  if(!position || !destination) return;
+  if(!position || !destination) {console.log("Position or dest null" + position + ", " + destination); return;}
+  if(position.lat == 0 && position.lng == 0) return;
 
       const shouldReroute = () => {
       if (!lastReroutePoint.current) return true;
 
-      const dist = getDistance(userPosition, lastReroutePoint.current);
+      const dist = getDistance(position, lastReroutePoint.current);
       console.log("Distance to last Route Point " + dist);
       return dist > 30; // 🔑 threshold (meters)
     };
 
-      const distToDestination = getDistance(userPosition, destination);
+      //Checks if the user arrived at the destination. 
+      //Does nothing for now except for stoping the pathfinding.
+      const distToDestination = getDistance(position, destination);
       console.log("Distance: " + distToDestination);
       if(distToDestination < 25){ // (meters)
-        setRouteStrokeWeight(0);
         setIsRoutingStarted(false);
         return ;
       }
     
 
     if(!shouldReroute()) return;
-    lastReroutePoint.current = userPosition;
-
+    lastReroutePoint.current = position;
 
   //Throttle API so we don't go overboard with the calls
   if(Date.now() - lastFetchTime.current < 500) {console.log("Too many calls"); return;}
@@ -165,14 +141,14 @@ const OutdoorPathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Goog-Api-Key": "api key",
+          "X-Goog-Api-Key": "place api here",
           "X-Goog-FieldMask":
             "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline",
         },
         body: JSON.stringify({
           origin: {
             location: {
-              latLng: { latitude: userPosition.lat, longitude: userPosition.lng },
+              latLng: { latitude: position.lat, longitude: position.lng },
             },
           },
           destination: {
@@ -191,8 +167,7 @@ const OutdoorPathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
     console.log(route);
     console.log(route.polyline.encodedPolyline);
 
-    // Decode polyline
-    
+    // Decode polyline 
     const decodedPath = geometry.encoding.decodePath(
       route.polyline.encodedPolyline
     );
@@ -212,11 +187,107 @@ const OutdoorPathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
 
   }
   getRoute();
-}, [position, geometry, isRoutingStarted, destination, userPosition]);
-   
+}, [position, geometry, isRoutingStarted, destination]);
+//////////////////////////////////////////////
+//End of position version of the pathfinding
+//////////////////////////////////////////////
+
+
+///////////////////////////////////////////
+//userPosition version of the pathfinding
+///////////////////////////////////////////
+//  useEffect(() => {
+
+//   if(!isRoutingStarted) return;
+//   if(!userPosition || !destination) return;
+
+//       const shouldReroute = () => {
+//       if (!lastReroutePoint.current) return true;
+
+//       const dist = getDistance(userPosition, lastReroutePoint.current);
+//       console.log("Distance to last Route Point " + dist);
+//       return dist > 30; // 🔑 threshold (meters)
+//     };
+
+//       //Checks if the user arrived at the destination. 
+//       //Does nothing for now except for stoping the pathfinding.
+//       const distToDestination = getDistance(userPosition, destination);
+//       console.log("Distance: " + distToDestination);
+//       if(distToDestination < 25){ // (meters)
+//         setIsRoutingStarted(false);
+//         return ;
+//       }
+    
+
+//     if(!shouldReroute()) return;
+//     lastReroutePoint.current = userPosition;
+
+
+//   //Throttle API so we don't go overboard with the calls
+//   if(Date.now() - lastFetchTime.current < 500) {console.log("Too many calls"); return;}
+//   lastFetchTime.current = Date.now();
+
+//   const getRoute = async () => {
+
+//     const response = await fetch(
+//       "https://routes.googleapis.com/directions/v2:computeRoutes",
+//       {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//           "X-Goog-Api-Key": "place api here",
+//           "X-Goog-FieldMask":
+//             "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline",
+//         },
+//         body: JSON.stringify({
+//           origin: {
+//             location: {
+//               latLng: { latitude: userPosition.lat, longitude: userPosition.lng },
+//             },
+//           },
+//           destination: {
+//             location: {
+//               latLng: { "latitude": destination.lat, "longitude": destination.lng },
+//             },
+//           },
+//           travelMode: "Walk",
+//         }),
+//       }
+//     );
+
+//     const data = await response.json();
+//     const route = data.routes[0];
+
+//     console.log(route);
+//     console.log(route.polyline.encodedPolyline);
+
+//     // Decode polyline 
+//     const decodedPath = geometry.encoding.decodePath(
+//       route.polyline.encodedPolyline
+//     );
+
+//     // Convert to plain lat/lng objects
+//     const pathCoords = decodedPath.map((point) => ({
+//       lat: point.lat(),
+//       lng: point.lng(),
+//     }));
+
+//     setPath(pathCoords);
+//     setRouteInfo({
+//       distance: route.distanceMeters,
+//       duration: route.duration,
+//     });
+
+
+//   }
+//   getRoute();
+// }, [geometry, isRoutingStarted, destination, userPosition]);
+/////////////////////////////////////////////////
+//End of userPosition version of the pathfinding
+////////////////////////////////////////////////
   return (
         <>
-              <Marker position={userPosition}></Marker>
+              <Marker position={position}></Marker>
               <Marker position={destination}></Marker>
               <Polyline 
                 path={path}

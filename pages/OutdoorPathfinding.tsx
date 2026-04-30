@@ -6,38 +6,38 @@ import { APIProvider,  Map, MapCameraChangedEvent } from '@vis.gl/react-google-m
 import { useLocation } from 'react-router';
 import { Marker, MapMouseEvent, useMap, useMapsLibrary, Polyline } from '@vis.gl/react-google-maps';
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { Geolocation } from '@capacitor/geolocation'
+import { Geolocation, Position } from '@capacitor/geolocation'
 
 
 interface PathfindingProps {
     userPosition: {lat: number, lng: number};
 }
 
-// type LatLng = {
-//   lat: number;
-//   lng: number;
-// }
+type LatLng = {
+  lat: number;
+  lng: number;
+}
 
-// function getDistance(a: LatLng, b:LatLng){
-//   const R = 6371e3;//meters
-//   const Phi1 = (a.lat * Math.PI) / 180;
-//   const Phi2 = (b.lat * Math.PI) / 180;
-//   const deltaPhi = ((b.lat - a.lat) * Math.PI) / 180;
-//   const deltaLambda = ((b.lng - a.lng) * Math.PI) / 180;
+function getDistance(a: LatLng, b:LatLng){
+  const R = 6371e3;//meters
+  const Phi1 = (a.lat * Math.PI) / 180;
+  const Phi2 = (b.lat * Math.PI) / 180;
+  const deltaPhi = ((b.lat - a.lat) * Math.PI) / 180;
+  const deltaLambda = ((b.lng - a.lng) * Math.PI) / 180;
 
-//     const x =
-//     Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-//     Math.cos(Phi1) *
-//     Math.cos(Phi2) *
-//     Math.sin(deltaLambda / 2) *
-//     Math.sin(deltaLambda / 2);
+    const x =
+    Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+    Math.cos(Phi1) *
+    Math.cos(Phi2) *
+    Math.sin(deltaLambda / 2) *
+    Math.sin(deltaLambda / 2);
 
-//   const d = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+  const d = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
 
-//   return R * d;
-// }
+  return R * d;
+}
 
-const OutsidePathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
+const OutdoorPathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
 
   const map = useMap();
   const geometry = useMapsLibrary("geometry");
@@ -57,47 +57,104 @@ const OutsidePathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
   const [isRoutingStarted, setIsRoutingStarted] = useState(false);
   const [isLocationStarted, setIsLocationStarted] = useState(false);
 
+  const [routeStrokeWeight, setRouteStrokeWeight] = useState(5);
 
-
+  const lastReroutePoint = useRef<LatLng | null>(null);
+  const watchId = useRef<string | null>(null);
 
 
   const handleRoutingStart = (e) => {
     setIsLocationStarted(true);
     setIsRoutingStarted(true);
+    setRouteStrokeWeight(5);
     console.log("Routing Start");
   }
 
 
 
 
-useEffect (() => {
-  // console.log("use effect location");
-  // if(!isLocationStarted) return;
+// useEffect (() => {
+//   // console.log("use effect location");
+//   // if(!isLocationStarted) return;
   
-  const getLocation = async  () => {
-        console.log("Getting Location");
-        try {
-        const coords = await Geolocation.getCurrentPosition();
-        setPosition({
-          lat: coords.coords.latitude,
-          lng: coords.coords.longitude,
-        });
+//   const getLocation = async  () => {
+//         console.log("Getting Location");
+//         try {
+//         const coords = await Geolocation.getCurrentPosition();
+//         setPosition({
+//           lat: coords.coords.latitude,
+//           lng: coords.coords.longitude,
+//         });
 
 
-      } catch (err) {
-        console.error("Error getting location", err);
+//       } catch (err) {
+//         console.error("Error getting location", err);
+//       }
+//   }
+//   getLocation();
+
+// }, [isLocationStarted])
+
+
+  useEffect(() => {
+    const startTracking = async () => {
+      watchId.current = await Geolocation.watchPosition(
+        {
+          enableHighAccuracy: true,
+        },
+        (pos: Position | null, err) => {
+          if (err || !pos) return;
+
+          const newPos = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          };
+
+          setPosition(newPos);
+          console.log(position.lat + ", " + position.lng);
+        }
+      );
+    };
+
+    startTracking();
+
+    return () => {
+      if (watchId.current) {
+        Geolocation.clearWatch({ id: watchId.current });
       }
-  }
-  getLocation();
+    };
+  }, [position]);
 
-}, [isLocationStarted])
 
 
  useEffect(() => {
 
   if(!isRoutingStarted) return;
+  if(!position || !destination) return;
+
+      const shouldReroute = () => {
+      if (!lastReroutePoint.current) return true;
+
+      const dist = getDistance(userPosition, lastReroutePoint.current);
+      console.log("Distance to last Route Point " + dist);
+      return dist > 30; // 🔑 threshold (meters)
+    };
+
+      const distToDestination = getDistance(userPosition, destination);
+      console.log("Distance: " + distToDestination);
+      if(distToDestination < 25){ // (meters)
+        setRouteStrokeWeight(0);
+        setIsRoutingStarted(false);
+        return ;
+      }
+    
+
+    if(!shouldReroute()) return;
+    lastReroutePoint.current = userPosition;
+
+
   //Throttle API so we don't go overboard with the calls
-  if(Date.now() - lastFetchTime.current < 5000) {console.log("Too many calls wait a few seconds"); return;}
+  if(Date.now() - lastFetchTime.current < 500) {console.log("Too many calls"); return;}
   lastFetchTime.current = Date.now();
 
   const getRoute = async () => {
@@ -108,14 +165,14 @@ useEffect (() => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Goog-Api-Key": "api here",
+          "X-Goog-Api-Key": "api key",
           "X-Goog-FieldMask":
             "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline",
         },
         body: JSON.stringify({
           origin: {
             location: {
-              latLng: { latitude: position.lat, longitude: position.lng },
+              latLng: { latitude: userPosition.lat, longitude: userPosition.lng },
             },
           },
           destination: {
@@ -123,7 +180,7 @@ useEffect (() => {
               latLng: { "latitude": destination.lat, "longitude": destination.lng },
             },
           },
-          travelMode: "DRIVE",
+          travelMode: "Walk",
         }),
       }
     );
@@ -155,17 +212,16 @@ useEffect (() => {
 
   }
   getRoute();
-  setIsRoutingStarted(false);
-}, [position, geometry, isRoutingStarted, destination]);
+}, [position, geometry, isRoutingStarted, destination, userPosition]);
    
   return (
         <>
-              <Marker position={position}></Marker>
+              <Marker position={userPosition}></Marker>
               <Marker position={destination}></Marker>
               <Polyline 
                 path={path}
                 options={{
-                strokeColor: "#4285F4",
+                strokeColor: "#9900ff",
                 strokeWeight: 5,
                 }}
               >
@@ -182,4 +238,4 @@ useEffect (() => {
   );
 };
 
-export default OutsidePathfinding;
+export default OutdoorPathfinding;

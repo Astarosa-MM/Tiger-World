@@ -7,6 +7,7 @@ import { useLocation } from 'react-router';
 import { Marker, MapMouseEvent, useMap, useMapsLibrary, Polyline, InfoWindow, useMarkerRef } from '@vis.gl/react-google-maps';
 import { useEffect, useState, useCallback } from 'react';
 import MapsComponents from './MapsComponents';
+import OutdoorPathfinding from './OutdoorPathfinding';
 
 
 const Tab2: React.FC = () => {
@@ -67,7 +68,7 @@ const Tab2: React.FC = () => {
           </IonPopover>
         </IonFab>
       
-        <APIProvider apiKey={' api here '} onLoad={() => console.log('Maps API Loaded')}>
+        <APIProvider apiKey={''} onLoad={() => console.log('Maps API Loaded')}>
           <Map
             defaultZoom={18}
             defaultCenter={{lat: 30.406266, lng: -91.184324}}
@@ -106,7 +107,7 @@ const Tab2: React.FC = () => {
               >
 
               </Polyline> */}
-              <MapsComponents userPosition={userPos}/>
+              <OutdoorPathfinding userPosition={userPos}/>
             </Map>
         
         

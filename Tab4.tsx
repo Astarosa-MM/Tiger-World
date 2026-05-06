@@ -1,119 +1,108 @@
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Tab4.css';
-import { add, arrowBack, arrowForward } from 'ionicons/icons';
+import { add, trash } from 'ionicons/icons';
+import { useEffect, useState } from 'react';
+import { useIonViewWillEnter } from '@ionic/react';
+import { useHistory, useLocation } from 'react-router';
 
 const Tab4: React.FC = () => {
+  const location = useLocation<any>();
+  const building = location.state?.building;
+  const [rooms, setRooms] = useState<any[]>([]);
+  const history = useHistory();
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem('rooms') || '[]');
+    setRooms(stored);
+  }, []);
+
+useIonViewWillEnter(() => {
+  const buildingId = location.state?.building?.id;
+
+  if (!buildingId) return;
+
+  const fetchRooms = async () => {
+    const res = await fetch(
+      `http://localhost:3000/api/rooms?building_id=${buildingId}`
+    );
+    const data = await res.json();
+
+    console.log("ROOMS:", data);
+
+    setRooms(data.rooms || []);
+  };
+
+  fetchRooms();
+});
+
+  const deleteRoom = (indexToDelete: number) => {
+    const updated = rooms.filter((_, index) => index !== indexToDelete);
+    setRooms(updated);
+    localStorage.setItem('rooms', JSON.stringify(updated));
+  };
+
+  const roomSorted = rooms.reduce((acc: any, room: any, originalIndex: number) => {
+    const type = room.room_classification || 'Other';
+    if (!acc[type]) acc[type] = [];
+    acc[type].push({ ...room, originalIndex });
+    return acc;
+  }, {});
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonButtons color="tertiary" slot="start">
-            <IonBackButton defaultHref="tab3"></IonBackButton>
+            <IonBackButton defaultHref="tab2"></IonBackButton>
           </IonButtons>
-          <IonTitle>Inside: Facility Services Building</IonTitle>
+          <IonTitle>Inside: Patrick F. Taylor</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Room list</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+    <IonContent fullscreen>
 
-        <IonList inset={true}>
-          <IonLabel><h1>Classrooms: </h1></IonLabel>
+{rooms.length === 0 ? (
+  <IonItem>
+    <IonLabel>There are no rooms added to this building.</IonLabel>
+  </IonItem>
+) : (
+  Object.keys(roomSorted).map((type) => (
+    <IonList key={type}>
+      <IonListHeader>
+        <IonLabel>
+          <h1>{type}</h1>
+        </IonLabel>
+      </IonListHeader>
 
-          <IonItem>
-            <IonLabel>FS 101</IonLabel>
-            <IonLabel><p>Availability: ???</p></IonLabel>
-            <IonButton color="tertiary">
-              <IonIcon icon={arrowForward}></IonIcon>
-            </IonButton>
-          </IonItem>
+      {roomSorted[type].map((room: any) => (
+        <IonItem key={room.room_ID}>
+          <IonLabel>
+            <h2>Room {room.room_number}</h2>
 
-          <IonItem>
-            <IonLabel>FS 102</IonLabel>
-            <IonLabel><p>Availability: ???</p></IonLabel>
-            <IonButton color="tertiary">
-              <IonIcon icon={arrowForward}></IonIcon>
-            </IonButton>
-          </IonItem>
+            {room.occupant && <p>{room.occupant}</p>}
+            {room.department && <p>{room.department}</p>}
+            {room.restroom_type && <p>{room.restroom_type}</p>}
+          </IonLabel>
+        </IonItem>
+      ))}
+    </IonList>
+  ))
+)}
 
-          <IonItem>
-            <IonLabel>FS 103</IonLabel>
-            <IonLabel><p>Availability: ???</p></IonLabel>
-            <IonButton color="tertiary">
-              <IonIcon icon={arrowForward}></IonIcon>
-            </IonButton>
-          </IonItem>
+        <div className="ion-margin">
 
-          <IonItem>
-            <IonLabel>FS 104</IonLabel>
-            <IonLabel><p>Availability: ???</p></IonLabel>
-            <IonButton color="tertiary">
-              <IonIcon icon={arrowForward}></IonIcon>
-            </IonButton>
-          </IonItem>
-        </IonList>
-
-        <IonList inset={true}>
-          <IonLabel><h1>Offices:</h1></IonLabel>
-
-          <IonItem>
-            <IonLabel>FS 221</IonLabel>
-            <IonLabel><p>Dr. Jane Smith</p></IonLabel>
-            <IonLabel><p>Physics</p></IonLabel>
-            <IonButton color="tertiary">
-              <IonIcon icon={arrowForward}></IonIcon>
-            </IonButton>
-          </IonItem>
-
-          <IonItem>
-            <IonLabel>FS 222</IonLabel>
-            <IonLabel><p>Instructor John Doe</p></IonLabel>
-            <IonLabel><p>Music</p></IonLabel>
-            <IonButton color="tertiary">
-              <IonIcon icon={arrowForward}></IonIcon>
-            </IonButton>
-          </IonItem>
-        </IonList>
-
-        <IonList inset={true}>
-          <IonLabel><h1>Restrooms</h1></IonLabel>
-
-          <IonItem>
-            <IonLabel>FS 100</IonLabel>
-            <IonLabel><p>Women's</p></IonLabel>
-            <IonLabel><p>Status: Open</p></IonLabel>
-            <IonButton color="tertiary">
-              <IonIcon icon={arrowForward}></IonIcon>
-            </IonButton>
-          </IonItem>
-
-          <IonItem>
-            <IonLabel>FS 200</IonLabel>
-            <IonLabel><p>Men's</p></IonLabel>
-            <IonLabel><p>Status: Closed</p></IonLabel>
-            <IonButton color="tertiary">
-              <IonIcon icon={arrowForward}></IonIcon>
-            </IonButton>
-          </IonItem>
-
-          <IonItem>
-            <IonLabel>FS 105</IonLabel>
-            <IonLabel><p>Genderless</p></IonLabel>
-            <IonLabel><p>Status: Open</p></IonLabel>
-            <IonButton color="tertiary">
-              <IonIcon icon={arrowForward}></IonIcon>
-            </IonButton>
-          </IonItem>
-        </IonList>
-
-        <IonButton color="tertiary" href="AddRoom">
-          <IonLabel>Add Room </IonLabel>
-          <IonIcon icon={add}></IonIcon>
+        <IonButton
+          color="tertiary"
+          onClick={() =>
+            history.push('/addroom', {
+              building: building
+            })
+          }
+        >
+          <IonLabel>Add Room</IonLabel>
+          <IonIcon icon={add} />
         </IonButton>
 
+        </div>
       </IonContent>
     </IonPage>
   );

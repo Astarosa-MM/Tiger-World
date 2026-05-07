@@ -229,25 +229,7 @@ useEffect(() => {
         </IonList>
       )}
 
-        <IonList inset={false}>
-          <IonItem>
-            <IonLabel> Add Photos: </IonLabel>
-              <IonButton color="tertiary" onClick={() => addNewToGallery()}>
-                <IonIcon icon={add}></IonIcon>
-              </IonButton>
-          </IonItem>
-          <IonItem>
-            <IonGrid>
-              <IonRow>
-                {photos.map((photo) => (
-                  <IonCol size="5" key={photo.filepath}>
-                    <IonImg src={photo.webviewPath} />
-                  </IonCol>
-                ))}
-              </IonRow>
-            </IonGrid>
-          </IonItem>
-        </IonList>
+        
 
         <div className="ion-margin"> 
           <IonButton onClick={handleSubmit} color="tertiary">

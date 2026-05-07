@@ -1,4 +1,4 @@
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonLabel, IonPage, IonTextarea, IonTitle, IonToolbar } from '@ionic/react';
+import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonLabel, IonPage, IonTextarea, IonTitle, IonToolbar, useIonRouter } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
 import './SignUp.css';
 import { arrowForward, copy } from 'ionicons/icons';
@@ -18,6 +18,8 @@ const SignUp: React.FC = () => {
   const [passwordValid, setPasswordValid] = useState(false);
   const [password, setPassword] = useState("");
   const [copyPassword, setCopyPassword] = useState("");
+
+  const router = useIonRouter();
   
   const saveUser = async () => {
   try {
@@ -34,6 +36,9 @@ const SignUp: React.FC = () => {
 
     const data = await response.json();
     console.log("User created:", data);
+
+    router.push('/tab1');
+
   } catch (error) {
     console.error("Signup error:", error);
   }

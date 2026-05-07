@@ -70,7 +70,7 @@ const App: React.FC = () => (
           <Route exact path="/tab2">
             <Tab2 />
           </Route>
-          <Route path="/tab3">
+          <Route path="/tab3/:id" component={Tab3}>
             <Tab3 />
           </Route>
           <Route exact path="/tab4">
@@ -91,9 +91,7 @@ const App: React.FC = () => (
           <Route exact path="/edit" component={Edit} />
           <Route exact path="/addbuilding" component={AddBuilding} />
           <Route exact path="/addroom" component={AddRoom} />
-          <Route exact path="/test">
-            <Test />
-          </Route>
+          <Route path="/edit-building/:id" component={Test} />
           <Route exact path="/edit-events">
             <EditEvents />
           </Route>
@@ -101,19 +99,7 @@ const App: React.FC = () => (
             <Redirect to="/tab1" />
           </Route>
         </IonRouterOutlet>
-        <IonTabBar slot="bottom">
 
-          <IonTabButton tab="tab2" href="/tab2">
-            <IonIcon aria-hidden="true" icon={globe} color="tertiary" />
-            <IonLabel color="tertiary">Home</IonLabel>
-          </IonTabButton>
-          
-          <IonTabButton tab="tab3" href="/tab3">
-            <IonIcon aria-hidden="true" icon={information} color="tertiary" />
-            <IonLabel color="tertiary">Info</IonLabel>
-          </IonTabButton>
-
-        </IonTabBar>
       </IonTabs>
     </IonReactRouter>
   </IonApp>

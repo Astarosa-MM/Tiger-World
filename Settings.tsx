@@ -2,8 +2,29 @@ import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, I
 import './Settings.css';
 import { arrowBack, eye, pencil, pencilOutline, pencilSharp } from 'ionicons/icons';
 import './PasswordField'; './CopyPasswordField';
+import { useEffect, useState } from 'react';
 
 const Settings: React.FC = () => {
+  const [user, setUser] = useState({email: "",});
+
+useEffect(() => {
+  const fetchUser = async () => {
+    const userId = localStorage.getItem("user_ID");
+
+    if (!userId) return;
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/auth/me/${userId}`);
+      const data = await res.json();
+      setUser(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchUser();
+}, []);
+
   return (
     <IonPage>
       <IonHeader>
@@ -24,11 +45,11 @@ const Settings: React.FC = () => {
             <IonList>
                 <IonItem>
                     <IonLabel>Email: </IonLabel>
-                    <IonLabel><p>example123@lsu.edu</p></IonLabel>
+                    <IonLabel><p>{user.email}</p></IonLabel>
                 </IonItem>
                 <IonItem>
                     <IonLabel>Password </IonLabel>
-                    <IonLabel><p>p********3</p></IonLabel>
+                    <IonLabel><p>********</p></IonLabel>
                     <IonButton color="tertiary">
                         <IonIcon icon={eye}></IonIcon>
                     </IonButton>

@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonHeader, IonIcon, IonInput, IonLabel, IonPage, IonTextarea, IonTitle, IonToolbar } from '@ionic/react';
+import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonLabel, IonPage, IonTextarea, IonTitle, IonToolbar } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
 import './SignUp.css';
 import { arrowForward, copy } from 'ionicons/icons';
@@ -6,16 +6,38 @@ import { useState } from 'react';
 import PasswordField from './PasswordField';
 import CopyPasswordField from './CopyPasswordField';
 
+
 const SignUp: React.FC = () => {
   //remember to clear passwords when switching pages
 
   const [emailInvalidText, setEmailInvalidText] = useState("");
   const [emailValid, setEmailValid] = useState(false);
+  const [emailValue, setEmail] = useState("");
 
   const [passwordInvalidText, setPasswordInvalidText] = useState("");
   const [passwordValid, setPasswordValid] = useState(false);
   const [password, setPassword] = useState("");
   const [copyPassword, setCopyPassword] = useState("");
+  
+  const saveUser = async () => {
+  try {
+    const response = await fetch("http://localhost:3000/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: emailValue,
+        password: password
+      })
+    });
+
+    const data = await response.json();
+    console.log("User created:", data);
+  } catch (error) {
+    console.error("Signup error:", error);
+  }
+};
 
   const handlePassordFieldChange = (val : string) =>{
     //At Least 6 Characters with at least one alphabet, one digit, and one special character
@@ -36,7 +58,6 @@ const SignUp: React.FC = () => {
     }
   }
 
-
   const handleCopyFieldChange = (val : string) => {
     setCopyPassword(val);
     if((val == password) && passwordValid){
@@ -50,38 +71,35 @@ const SignUp: React.FC = () => {
     }
   }
 
-  const handleEmailFieldChange = (e : CustomEvent) => {
-    //An alphanumeric or digit ending in @lsu.edu Email
-    const passwordRegex =  /^[a-zA-Z][a-zA-Z0-9]*@lsu\.edu$/;
+const handleEmailFieldChange = (e: CustomEvent) => {
+  const value = e.detail.value;
 
-    if(passwordRegex.test(e.detail.value)){
-      setEmailInvalidText("");
-      setEmailValid(true);
-    }
-    else{
-      setEmailInvalidText("You must enter a valid email.");
-      setEmailValid(false);
-    }
+  setEmail(value); 
+
+  const regex = /^[a-zA-Z][a-zA-Z0-9]*@lsu\.edu$/;
+
+  if (regex.test(value)) {
+    setEmailInvalidText("");
+    setEmailValid(true);
+  } else {
+    setEmailInvalidText("You must enter a valid email.");
+    setEmailValid(false);
   }
+};
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Welcome</IonTitle>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="tab1"></IonBackButton>
+          </IonButtons>
+          <IonTitle>Sign Up: </IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Welcome</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        
-        <IonLabel>
-          <h1>Sign Up</h1>
-        </IonLabel>
 
-        <p>Enter a valid lsu.edu email.</p>
+        <div className="ion-margin"><p>Enter a valid lsu.edu email.</p></div>
         
         <p className="email-invalid">{emailInvalidText}</p>
         <div></div>
@@ -100,10 +118,13 @@ const SignUp: React.FC = () => {
 
         <CopyPasswordField onCopyFieldChange={handleCopyFieldChange}/>
       
-        <IonButton href="tab2" color="tertiary" disabled= {(password == copyPassword && passwordValid && emailValid) ? false : true}>
-          <IonLabel>Sign Up: </IonLabel>
-          <IonIcon icon={arrowForward}></IonIcon>
-        </IonButton>
+        <div className="ion-margin">
+          <IonButton color="tertiary" disabled={!(password == copyPassword && passwordValid && emailValid)} onClick={saveUser}
+          >
+            <IonLabel>Sign Up:</IonLabel>
+            <IonIcon icon={arrowForward}></IonIcon>
+            </IonButton>
+        </div>
 
       </IonContent>
     </IonPage>

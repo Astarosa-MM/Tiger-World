@@ -4,7 +4,10 @@ import './Tab2.css';
 import { Marker, useMap, useMapsLibrary, Polyline } from '@vis.gl/react-google-maps';
 import { useEffect, useState, useRef } from 'react';
 import { Geolocation, Position } from '@capacitor/geolocation'
+import { loadEnv } from 'vite'
 
+
+const mapsApi = import.meta.env.VITE_GOOGLE_MAPS_API;
 
 interface PathfindingProps {
     //This props is used for testing purposes when
@@ -113,7 +116,7 @@ const OutdoorPathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
 
       const dist = getDistance(position, lastReroutePoint.current);
       console.log("Distance to last Route Point " + dist);
-      return dist > 30; // 🔑 threshold (meters)
+      return dist > 30; // threshold (meters)
     };
 
       //Checks if the user arrived at the destination. 
@@ -141,7 +144,7 @@ const OutdoorPathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Goog-Api-Key": "place api here",
+          "X-Goog-Api-Key": mapsApi,
           "X-Goog-FieldMask":
             "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline",
         },
@@ -206,7 +209,7 @@ const OutdoorPathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
 
 //       const dist = getDistance(userPosition, lastReroutePoint.current);
 //       console.log("Distance to last Route Point " + dist);
-//       return dist > 30; // 🔑 threshold (meters)
+//       return dist > 30; // threshold (meters)
 //     };
 
 //       //Checks if the user arrived at the destination. 
@@ -235,7 +238,7 @@ const OutdoorPathfinding: React.FC<PathfindingProps> = ({userPosition}) => {
 //         method: "POST",
 //         headers: {
 //           "Content-Type": "application/json",
-//           "X-Goog-Api-Key": "place api here",
+//           "X-Goog-Api-Key": mapsApi,
 //           "X-Goog-FieldMask":
 //             "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline",
 //         },

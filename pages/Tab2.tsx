@@ -9,6 +9,7 @@ import { useEffect, useState, useCallback } from 'react';
 import MapsComponents from './MapsComponents';
 import OutdoorPathfinding from './OutdoorPathfinding';
 
+const mapsApi = import.meta.env.VITE_GOOGLE_MAPS_API;
 
 const Tab2: React.FC = () => {
   const location = useLocation<any>();
@@ -60,7 +61,7 @@ const Tab2: React.FC = () => {
           </IonPopover>
         </IonFab>
       
-        <APIProvider apiKey={'place api here'} onLoad={() => console.log('Maps API Loaded')}>
+        <APIProvider apiKey={mapsApi} onLoad={() => console.log('Maps API Loaded')}>
           <Map
             defaultZoom={18}
             defaultCenter={{lat: 30.410143928242466, lng: -91.17549202235222}}

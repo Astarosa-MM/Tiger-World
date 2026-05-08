@@ -1,8 +1,8 @@
 # Tiger World : Team 5
 # Members
-SCRUM Master: Mia Miranda ([GitHub Name])\
-UI/UX Designer: Katherine Winchester ([GitHub Name])\
-Software Architect: Stella Levy ([GitHub Name])\
+SCRUM Master: Mia Miranda (Astarosa-MM)\
+UI/UX Designer: Katherine Winchester (kwinch)\
+Software Architect: Stella Levy (slevy7736)\
 Senior Developer: Brent Bolden (BrentBolden)\
 Product Tester: Khoa Vu ([GitHub Name])
 

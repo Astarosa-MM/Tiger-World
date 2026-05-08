@@ -14,7 +14,7 @@ Tiger World is a mobile app that provides campus navigation. It displays the the
 # Important Links
 Kanban Board: https://lsu-csc4330-tiger-world.atlassian.net/jira/software/projects/SCRUM/boards/1 \
 Designs: [link]\
-Styles Guide(s): https://docs.google.com/document/d/13S4DtvSZUoB4N65jG5OZDvNeZFt2y_8YWrdrPT-IP1Y/edit?tab=t.0 \
+Styles Guide(s): https://docs.google.com/document/d/13S4DtvSZUoB4N65jG5OZDvNeZFt2y_8YWrdrPT-IP1Y/edit?tab=t.0 
 
 # How to Run Dev and Test Environment
 

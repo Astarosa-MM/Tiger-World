@@ -3,29 +3,18 @@ import './Tab3.css';
 import { arrowForward, link } from 'ionicons/icons';
 import { usePhotoGallery } from '../hooks/useCamera';
 import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
+import { useLocation, useHistory } from 'react-router';
+import { Building } from './types';
 
 const Tab3: React.FC = () => {
   const { photos, addNewToGallery } = usePhotoGallery();
-
   const [rooms, setRooms] = useState<any[]>([]);
-    
-  const [building, setBuilding] = useState<any>({});
- 
   const history = useHistory();
-  
-  useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('rooms') || '[]');
-    setRooms(stored);
-  }, []);
-  
-  useIonViewWillEnter(() => {
-    const stored = JSON.parse(localStorage.getItem('building') || '{}');
-    setBuilding(stored);
+ 
+  const location = useLocation<any>();
+  const building = location.state?.building;
+  const buildingFromState = location.state?.building;
 
-    const roomData = JSON.parse(localStorage.getItem('rooms') || '[]');
-    setRooms(roomData);
-  });
 
   return (
     <IonPage>
@@ -39,15 +28,16 @@ const Tab3: React.FC = () => {
       </IonHeader>
       <IonContent fullscreen>
 
+      {building && (
         <div className="ion-margin">
           <IonLabel class="ion-text-wrap"> 
-            <h1>{building.name}</h1> 
-            <p>{building.address}</p> 
+            <h1>{building?.name}</h1> 
+            <p>{building?.address}</p> 
             <p>Baton Rouge, LA 70803</p> 
           </IonLabel>
 
           <IonItem>
-            <IonLabel> <h1>Phone: </h1> <p>{building.phone}</p></IonLabel>
+            <IonLabel> <h1>Phone: </h1> <p>{building?.phone}</p></IonLabel>
           </IonItem>
 
           <IonItem>
@@ -81,25 +71,25 @@ const Tab3: React.FC = () => {
           <IonList inset={false}>
             <div className="ion-margin"><IonLabel> <h1> Hours: </h1> </IonLabel></div>
             <IonItem>
-              <IonLabel><p>Mon: {building.mondayOpen} - {building.mondayClose}</p></IonLabel>
+              <IonLabel><p>Mon: {building?.mondayOpen} - {building?.mondayClose}</p></IonLabel>
             </IonItem>
             <IonItem>
-              <IonLabel><p>Tues: {building.tuesdayOpen} - {building.tuesdayClose}</p></IonLabel>
+              <IonLabel><p>Tues: {building?.tuesdayOpen} - {building?.tuesdayClose}</p></IonLabel>
             </IonItem>
             <IonItem>
-              <IonLabel><p>Wed: {building.wednesdayOpen}- {building.wednesdayClose}</p></IonLabel>
+              <IonLabel><p>Wed: {building?.wednesdayOpen}- {building?.wednesdayClose}</p></IonLabel>
             </IonItem>
             <IonItem>
-              <IonLabel><p>Thurs: {building.thursdayOpen}- {building.thursdayClose}</p></IonLabel>
+              <IonLabel><p>Thurs: {building?.thursdayOpen}- {building?.thursdayClose}</p></IonLabel>
             </IonItem>
             <IonItem>
-              <IonLabel><p>Fri: {building.fridayOpen}- {building.fridayClose}</p></IonLabel>
+              <IonLabel><p>Fri: {building?.fridayOpen}- {building?.fridayClose}</p></IonLabel>
             </IonItem>
             <IonItem>
-              <IonLabel><p>Sat: {building.saturdayOpen}- {building.saturdayClose}</p></IonLabel>
+              <IonLabel><p>Sat: {building?.saturdayOpen}- {building?.saturdayClose}</p></IonLabel>
             </IonItem>
             <IonItem>
-              <IonLabel><p>Sun: {building.sundayOpen}- {building.sundayClose}</p></IonLabel>
+              <IonLabel><p>Sun: {building?.sundayOpen}- {building?.sundayClose}</p></IonLabel>
             </IonItem>
           </IonList> 
 
@@ -122,11 +112,17 @@ const Tab3: React.FC = () => {
             <IonIcon icon={arrowForward}></IonIcon>  
           </IonButton>
 
-          <IonButton color="tertiary" href="test">
+          <IonButton
+            onClick={() =>
+              history.push(`/edit-building/${building.id || building.building_ID}`, {
+                building
+            })}
+          >
             <IonLabel>Is this correct? Make an edit</IonLabel>
             <IonIcon icon={arrowForward}></IonIcon>
           </IonButton>
           </div>
+        )}
 
       </IonContent>
     </IonPage>

@@ -32,13 +32,10 @@ router.post("/", async (req, res) => {
   const db = req.app.locals.db;
 
   try {
-    let {
+    const {
       building_ID,
       room_number,
-      room_classification,
-      occupant,
-      department,
-      restroom_type
+      room_classification
     } = req.body;
 
     if (!building_ID || !room_number) {
@@ -56,26 +53,25 @@ router.post("/", async (req, res) => {
       "OTHER"
     ];
 
-    if (room_classification && !allowed.includes(room_classification)) {
+    const classification = room_classification?.toUpperCase();
+
+    if (classification && !allowed.includes(classification)) {
       return res.status(400).json({
         error: "Invalid room_classification"
       });
     }
 
-await db.execute(
-  `INSERT INTO room 
-  (building_ID, room_number, room_classification, room_status, occupant, department, restroom_type)
-  VALUES (?, ?, ?, ?, ?, ?, ?)`,
-  [
-    building_ID,
-    room_number,
-    room_classification || "CLASSROOM",
-    "AVAILABLE",
-    occupant ?? null,
-    department ?? null,
-    restroom_type ?? null
-  ]
-);
+    await db.execute(
+      `INSERT INTO room 
+      (building_ID, room_number, room_classification, room_status)
+      VALUES (?, ?, ?, ?)`,
+      [
+        building_ID,
+        room_number,
+        classification || "CLASSROOM",
+        "AVAILABLE"
+      ]
+    );
 
     res.status(201).json({ message: "Room created" });
 

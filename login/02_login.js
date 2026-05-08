@@ -12,9 +12,11 @@ router.post("/login", async (req, res) => {
 
   try {
     const [rows] = await db.execute(
-      `SELECT user_ID, password_hash FROM users WHERE email = ?`,
+      'SELECT user_ID, password_hash FROM `user` WHERE email = ?',
       [email.trim()]
     );
+
+    console.log("ROWS:", rows);
 
     if (rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
@@ -33,10 +35,15 @@ router.post("/login", async (req, res) => {
       user_ID: user.user_ID
     });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
+} catch (err) {
+  console.error("LOGIN CRASH:", err);
+  console.error("STACK:", err.stack);
+
+  return res.status(500).json({
+    error: err.message,
+    stack: err.stack
+  });
+}
 }); 
 
 export default router;

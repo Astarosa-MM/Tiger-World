@@ -2,31 +2,55 @@ import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, I
 import './AddRoom.css';
 import { arrowForward } from 'ionicons/icons';
 import { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 const AddRoom: React.FC = () => {
 
-  const [building, setBuilding] = useState("");
+const location = useLocation<any>();
+
   const [type, setType] = useState("");
   const [number, setNumber] = useState("");
   const [floor, setFloor] = useState("");
   const [restroom, setRestroom] = useState("");
   const [department, setDepartment] = useState("");
   const [occupant, setOccupant] = useState("");
+  const history = useHistory();
 
-  const handleSubmit = async () => {
-    const newClass = {
-      building, type, number, floor, restroom, department, occupant
-    };
-    
-    const existing = JSON.parse(localStorage.getItem('rooms') || '[]');
-    existing.push(newClass);
+  console.log("FULL LOCATION STATE:", location.state);
 
-    localStorage.setItem('rooms', JSON.stringify(existing));
-    history.push('tab4');
+const handleSubmit = async () => {
+  const building = location.state?.building;
+  const buildingId = building?.id;
+
+  if (!buildingId || !number || !type) {
+    console.error("Missing fields", { buildingId, number, type });
+    return;
   }
 
-  const history = useHistory();
+  const res = await fetch("https://balanced-upliftment-production-fd8f.up.railway.app/api/rooms", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      building_ID: buildingId,
+      room_number: number,
+      room_classification: type.toUpperCase(),
+      occupant: occupant || null,
+      department: department || null,
+      restroom_type: restroom || null
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    console.error("SERVER ERROR:", err);
+    return;
+  }
+
+  history.push('/tab4', {
+    building: building
+  });
+};
+
 
   return (
     <IonPage>
@@ -53,7 +77,7 @@ const AddRoom: React.FC = () => {
                     <IonSelectOption value="Restroom">Restroom</IonSelectOption>
                     <IonSelectOption value="Classroom">Classroom</IonSelectOption>
                     <IonSelectOption value="Laboratory">Laboratory</IonSelectOption>
-                    <IonSelectOption value="E/S">Elevator/Staircase</IonSelectOption>
+                    <IonSelectOption value="Food">Food</IonSelectOption>
                     <IonSelectOption value="Other">Other</IonSelectOption>
                   </IonSelect>
                 </IonItem>
@@ -77,7 +101,7 @@ const AddRoom: React.FC = () => {
                 </IonItem>
               )}
 
-              {type === "Office" || type === "Laboratory" && (
+              {(type === "Office" || type === "Laboratory") && (
                 <IonItem>
                   <IonInput color="tertiary" label="Department: " type="text" value={department} onIonChange={e => setDepartment(e.detail.value!)}></IonInput>
                 </IonItem>

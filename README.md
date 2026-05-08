@@ -33,8 +33,10 @@ Then go into cmd and go into the project root directory and run these commands.
 npm install @vis.gl/react-google-maps
 npm install @capacitor/geolocation
 ```
-
-
+Finally run dev and follow the localhost link.
+```sh
+npm run dev
+```
 
 ## Commands
 Describe how the commands and process to launch the project on the main branch in such a way that anyone working on the project knows how to check the affects of any code they add.
@@ -42,4 +44,8 @@ Describe how the commands and process to launch the project on the main branch i
 To install ionic and the other dependencies go to the root folder of the project and run npm install:
 ```sh
 npm install
+```
+To run the dev server.
+```sh
+npm run dev
 ```

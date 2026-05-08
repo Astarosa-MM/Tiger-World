@@ -23,11 +23,18 @@ Styles Guide(s): https://docs.google.com/document/d/13S4DtvSZUoB4N65jG5OZDvNeZFt
 -npm \
 -Node.js
 ### Downloading Dependencies
-To use npm you must install Node.js from https://nodejs.org/en/download. Aftwardds go to the root directory of the project and run npm install to install ionic and other dependecies.
+To use npm you must install Node.js from https://nodejs.org/en/download. Afterwards go to the root directory of the project and run npm install to install ionic and other dependecies.
 
 ```sh
 npm install
 ```
+Then go into cmd and go into the project root directory and run these commands.
+```sh
+npm install @vis.gl/react-google-maps
+npm install @capacitor/geolocation
+```
+
+
 
 ## Commands
 Describe how the commands and process to launch the project on the main branch in such a way that anyone working on the project knows how to check the affects of any code they add.

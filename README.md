@@ -19,12 +19,16 @@ Styles Guide(s): https://docs.google.com/document/d/13S4DtvSZUoB4N65jG5OZDvNeZFt
 # How to Run Dev and Test Environment
 
 ## Dependencies
--Ionic
--npm
+-Ionic \
+-npm \
 -Node.js
 ### Downloading Dependencies
-You only need to install Node.js from https://nodejs.org/en/download to use npm. Ionic can
-be installed from the command line.
+To use npm you must install Node.js from https://nodejs.org/en/download. Aftwardds go to the root directory of the project and run npm install to install ionic and other dependecies.
+
+```sh
+npm install
+```
+
 ## Commands
 Describe how the commands and process to launch the project on the main branch in such a way that anyone working on the project knows how to check the affects of any code they add.
 

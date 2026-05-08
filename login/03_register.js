@@ -15,20 +15,21 @@ router.post("/register", async (req, res) => {
     const hash = await bcrypt.hash(password, saltRounds);
 
     await db.execute(
-      "INSERT INTO `users` (email, password_hash) VALUES (?, ?)",
+      "INSERT INTO `user` (email, password_hash) VALUES (?, ?)",
       [email.trim(), hash]
     );
 
     res.status(201).json({ message: "Account created" });
 
   } catch (err) {
-    if (err.code === "ER_DUP_ENTRY") {
-      return res.status(409).json({ error: "Email already exists" });
-    }
+  console.log("FULL ERROR:", err);
+  console.log("STACK:", err.stack);
 
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
+  return res.status(500).json({
+    message: err.message,
+    stack: err.stack
+  });
+}
 }); 
 
 export default router;

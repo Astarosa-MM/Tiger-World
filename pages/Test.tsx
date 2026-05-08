@@ -1,8 +1,8 @@
 import { add, arrowForward, trash } from 'ionicons/icons';
 import {IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonGrid, IonRow, IonCol, IonImg, IonButton, IonLabel, IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonPopover, IonButtons, IonBackButton, IonAccordion, IonAccordionGroup,} from '@ionic/react';
 import { usePhotoGallery } from '../hooks/useCamera';
-import { useState } from 'react';
-import { useHistory } from 'react-router';
+import { useState, useEffect } from 'react';
+import { useHistory, useParams, useLocation } from 'react-router';
 
 const Test: React.FC = () => {
   const { photos, addNewToGallery, deletePhoto } = usePhotoGallery();
@@ -25,16 +25,89 @@ const Test: React.FC = () => {
   const [sundayOpen, setSundayOpen] = useState('')
   const [sundayClose, setSundayClose] = useState('');
 
-    const handleCreate = () => {
-      const newBuilding = {
-        name, days, address, phone, mondayOpen, mondayClose, tuesdayOpen, tuesdayClose, wednesdayOpen, wednesdayClose, thursdayOpen, thursdayClose, fridayOpen, fridayClose, saturdayOpen, saturdayClose, sundayOpen, sundayClose
-      };
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
 
-      localStorage.setItem('building', JSON.stringify(newBuilding));
-      history.push('/tab3');
-    };
+  const { id } = useParams<{ id: string }>();
+
+  const history = useHistory();
   
-    const history = useHistory();
+  const location = useLocation<any>();
+
+const handleUpdate = async () => {
+  if (!id) {
+    console.error("No building ID found");
+    return;
+  }
+
+  await fetch(`http://localhost:3000/api/buildings/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name,
+      address,
+      phone,
+      days,
+      mondayOpen,
+      mondayClose,
+      tuesdayOpen,
+      tuesdayClose,
+      wednesdayOpen,
+      wednesdayClose,
+      thursdayOpen,
+      thursdayClose,
+      fridayOpen,
+      fridayClose,
+      saturdayOpen,
+      saturdayClose,
+      sundayOpen,
+      sundayClose,
+      lat,
+      lng
+    })
+  });
+
+  history.push('/tab3');
+};
+
+useEffect(() => {
+  if (!id) {
+    console.error("No building ID found");
+    return;
+  }
+
+  const fetchBuilding = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/buildings/${id}`);
+
+      if (!res.ok) {
+        console.error("Failed to fetch building");
+        return;
+      }
+
+      const data = await res.json();
+      const b = data.building;
+
+      if (!b) {
+        console.error("No building returned");
+        return;
+      }
+
+      setName(b.name || '');
+      setAddress(b.address || '');
+      setPhone(b.phone || '');
+      setLat(b.lat ?? null);
+      setLng(b.lng ?? null);
+
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+  };
+
+  fetchBuilding();
+}, [id]);
 
   return (
     <IonPage>
@@ -52,7 +125,39 @@ const Test: React.FC = () => {
         <IonInput color="tertiary" type="text" label="Edit Address: " value={address} fill="solid" onIonChange={e => setAddress(e.detail.value!)}></IonInput>
         <IonInput color="tertiary" type="url" label="Edit Website: " value=" " fill="solid"></IonInput>
         <IonInput color="tertiary" type="text" label="Edit Phone Number:" value={phone} fill="solid" onIonChange={e => setPhone(e.detail.value!)}></IonInput>
-        <IonInput color="tertiary" type="text" label="Edit Coordinates: " fill="solid"></IonInput>
+      <IonInput
+        color="tertiary"
+        type="text"
+        fill="solid"
+        label="Enter Latitude:"
+        value={lat ?? ''}
+        onIonChange={(e) => {
+          const val = e.detail.value;
+          if (!val) {
+            setLat(null);
+            return;
+          }
+          const num = parseFloat(val);
+          setLat(isNaN(num) ? null : num);
+        }}
+      />
+
+      <IonInput
+        color="tertiary"
+        type="text"
+        fill="solid"
+        label="Enter Longitude:"
+        value={lng ?? ''}
+        onIonChange={(e) => {
+          const val = e.detail.value;
+          if (!val) {
+            setLng(null);
+            return;
+          }
+          const num = parseFloat(val);
+          setLng(isNaN(num) ? null : num);
+        }}
+      />
 
         <IonSelect fill="solid" color="tertiary" label="Days of Operation: " multiple={true} value={days} onIonChange={e => setDays(e.detail.value)}>
           <IonSelectOption value="Monday">Monday</IonSelectOption>
@@ -138,7 +243,7 @@ const Test: React.FC = () => {
         </IonList>
 
       <div className="ion-margin">
-        <IonButton onClick={handleCreate} color="tertiary"> 
+        <IonButton onClick={handleUpdate} color="tertiary"> 
           <IonLabel>Submit</IonLabel>
           <IonIcon icon={arrowForward}></IonIcon>
         </IonButton>

@@ -59,11 +59,13 @@ const Edit: React.FC = () => {
         <IonInput fill="solid" color="tertiary" label="Enter Building: " placeholder="Type here" value={building} onIonChange={(e) => setBuilding(e.detail.value!)}></IonInput>
         <IonInput fill="solid" color="tertiary" label="Enter Room Number: " placeholder="Type here" value={room} onIonChange={(e) => setRoom(e.detail.value!)}></IonInput>
 
-        <IonButton onClick={handleCreate} color="tertiary">
+        <div className="ion-margin">
+          <IonButton onClick={handleCreate} color="tertiary">
             <IonLabel>Create</IonLabel>
             <IonIcon icon={arrowForward}></IonIcon>
-        </IonButton>
-
+          </IonButton>
+        </div>
+        
       </IonContent>
     </IonPage>
   );
